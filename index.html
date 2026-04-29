@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2563EB">
+<meta name="description" content="常州图文快印4门店日销售协作报表系统">
+<title>常州图文快印-门店报表</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+/* ==================== CSS VARIABLES ==================== */
+:root {
+  --primary: #2563EB;
+  --primary-dark: #1E40AF;
+  --primary-light: #DBEAFE;
+  --accent: #F59E0B;
+  --success: #10B981;
+  --danger: #EF4444;
+  --bg: #F1F5F9;
+  --card: #FFFFFF;
+  --text: #1E293B;
+  --text-secondary: #64748B;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --store-downtown: #2563EB;
+  --store-newzone: #10B981;
+  --store-hutang: #F59E0B;
+  --store-factory: #8B5CF6;
+}
+
+/* ==================== RESET & BASE ==================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "PingFang SC", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  min-height: 100dvh;
+}
+body { font-size: 15px; line-height: 1.5; overflow-x: hidden; }
+input, button, select, textarea { font-family: inherit; font-size: inherit; border: none; outline: none; background: none; }
+button { cursor: pointer; user-select: none; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; }
+
+/* ==================== APP CONTAINER ==================== */
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+.app-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 16px 16px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding-bottom: 16px;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.header-subtitle {
+  font-size: 12px;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.header-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.icon-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
+
+/* Date navigator */
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 6px;
+  margin-top: 8px;
+}
+.date-nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.date-nav-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.92); }
+.date-display {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.date-display:active { background: rgba(255,255,255,0.15); }
+.quick-dates {
+  display: flex;
+  gap: 4px;
+}
+.quick-date-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.quick-date-btn.active { background: white; color: var(--primary); }
+.quick-date-btn:active { transform: scale(0.95); }
+
+/* ==================== MAIN CONTENT ==================== */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 90px;
+  -webkit-overflow-scrolling: touch;
+}
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ==================== SUMMARY CARDS ==================== */
+.summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.summary-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 12px 10px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.summary-card.blue::before { background: var(--primary); }
+.summary-card.green::before { background: var(--success); }
+.summary-card.orange::before { background: var(--accent); }
+.summary-card-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+.summary-card-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* ==================== STORE CARDS ==================== */
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.store-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.store-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 3px solid;
+}
+.store-card:active { transform: scale(0.98); }
+.store-card.downtown { border-color: var(--store-downtown); }
+.store-card.newzone { border-color: var(--store-newzone); }
+.store-card.hutang { border-color: var(--store-hutang); }
+.store-card.factory { border-color: var(--store-factory); }
+.store-card.empty { opacity: 0.5; }
+.store-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.store-name {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.store-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.store-dot.downtown { background: var(--store-downtown); }
+.store-dot.newzone { background: var(--store-newzone); }
+.store-dot.hutang { background: var(--store-hutang); }
+.store-dot.factory { background: var(--store-factory); }
+.store-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.badge-empty { background: #FEF3C7; color: #92400E; }
+.badge-filled { background: #D1FAE5; color: #065F46; }
+.store-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.store-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.store-stat-label { color: var(--text-secondary); }
+.store-stat-value { font-weight: 700; color: var(--text); }
+.store-stat-value.highlight { color: var(--primary); font-size: 14px; }
+
+/* ==================== FORM ==================== */
+.form-section {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.form-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.form-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.form-prefix {
+  position: absolute;
+  left: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  pointer-events: none;
+}
+.form-suffix {
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+.form-input {
+  width: 100%;
+  height: 48px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 36px 0 28px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+  background: white;
+}
+.form-input.has-prefix { padding-left: 28px; }
+.form-input.has-suffix { padding-right: 40px; }
+.form-input::placeholder { color: #CBD5E1; font-weight: 400; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
+.save-btn {
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+  letter-spacing: 1px;
+}
+.save-btn:active { transform: scale(0.98); box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
+.save-btn:disabled { opacity: 0.6; transform: none; }
+.save-btn.success {
+  background: linear-gradient(135deg, var(--success), #059669);
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+
+/* ==================== CHARTS ==================== */
+.chart-container {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chart-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+.chart-canvas-wrap.tall { height: 260px; }
+canvas { display: block; width: 100% !important; }
+
+/* Legend */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==================== DATA TABLE ==================== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.data-table thead th {
+  background: var(--primary);
+  color: white;
+  padding: 10px 8px;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+.data-table thead th:first-child { text-align: left; padding-left: 12px; }
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.data-table tbody tr:nth-child(even) { background: #F8FAFC; }
+.data-table tbody tr:active { background: var(--primary-light); }
+.data-table tbody td {
+  padding: 9px 8px;
+  text-align: center;
+  color: var(--text);
+}
+.data-table tbody td:first-child { text-align: left; padding-left: 12px; font-weight: 600; }
+.data-table tbody td.num { font-weight: 700; font-variant-numeric: tabular-nums; }
+.data-table tbody td.store-cell { display: flex; align-items: center; gap: 6px; }
+.data-table .total-row td {
+  background: #EFF6FF;
+  font-weight: 700;
+  color: var(--primary);
+  border-top: 2px solid var(--primary);
+}
+
+/* ==================== TAB BAR ==================== */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 4px 0 calc(4px + var(--safe-bottom));
+  z-index: 200;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  transition: all 0.2s;
+  position: relative;
+  min-height: 56px;
+  justify-content: center;
+}
+.tab-icon {
+  font-size: 22px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+.tab-item.active { color: var(--primary); }
+.tab-item.active .tab-icon { transform: scale(1.15); }
+.tab-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%) scaleX(0);
+  width: 32px; height: 3px;
+  background: var(--primary);
+  border-radius: 0 0 3px 3px;
+  transition: transform 0.2s;
+}
+.tab-item.active::before { transform: translateX(-50%) scaleX(1); }
+
+/* ==================== MODAL ==================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+.modal-sheet {
+  background: white;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  padding: 20px;
+  padding-bottom: calc(20px + var(--safe-bottom));
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+/* Month picker */
+.month-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.month-btn {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+.month-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.month-btn:active { transform: scale(0.97); }
+
+/* ==================== LOGIN / WELCOME ==================== */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 50%, #1e3a8a 100%);
+}
+.login-logo {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+.login-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.login-subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  margin-bottom: 40px;
+}
+.login-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 16px;
+}
+.login-role-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+  border: 2px solid var(--border);
+  background: white;
+  color: var(--text);
+}
+.login-role-btn:last-child { margin-bottom: 0; }
+.login-role-btn:active { transform: scale(0.98); background: var(--primary-light); border-color: var(--primary); }
+.login-role-btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+.login-role-icon { font-size: 28px; }
+.login-role-text { text-align: left; }
+.login-role-desc { font-size: 11px; color: var(--text-secondary); font-weight: 400; margin-top: 1px; }
+.login-role-btn.primary .login-role-desc { color: rgba(255,255,255,0.8); }
+.login-qr-hint {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  margin-top: 8px;
+}
+.login-footer {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Store picker for employee */
+.store-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.store-select-btn {
+  padding: 14px 10px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  background: white;
+  transition: all 0.2s;
+}
+.store-select-btn:active { transform: scale(0.97); }
+.store-select-btn.selected { border-width: 2px; }
+.store-select-btn .emoji { font-size: 28px; }
+
+/* ==================== EXPORT / REPORT ==================== */
+.export-preview {
+  background: white;
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  transform-origin: top center;
+}
+.report-paper {
+  width: 100%;
+  background: white;
+  padding: 16px;
+  font-size: 11px;
+  color: #1a1a1a;
+}
+.report-header {
+  text-align: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--primary);
+}
+.report-header h1 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.report-header h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.report-header .date-range {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.report-section { margin-bottom: 12px; }
+.report-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.report-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.report-table th { background: var(--primary); color: white; padding: 5px 4px; font-weight: 700; text-align: center; }
+.report-table th:first-child { text-align: left; }
+.report-table td { padding: 5px 4px; text-align: center; border-bottom: 1px solid var(--border); }
+.report-table td:first-child { text-align: left; font-weight: 600; }
+.report-table .total-row td { background: #EFF6FF; font-weight: 700; }
+.report-chart-area { height: 140px; position: relative; margin: 8px 0; }
+.export-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.export-btn {
+  height: 48px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.export-btn.primary { background: var(--primary); color: white; }
+.export-btn.secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+.export-btn:active { transform: scale(0.97); }
+
+/* ==================== NOTIFICATION ==================== */
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--text);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 500;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  white-space: nowrap;
+  max-width: calc(100% - 32px);
+}
+.notification.show { transform: translateX(-50%) translateY(0); }
+.notification.success { background: var(--success); }
+.notification.error { background: var(--danger); }
+
+/* ==================== MONTHLY VIEW ==================== */
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 6px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.month-nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.month-nav-btn:active { background: var(--primary-light); transform: scale(0.92); }
+.month-nav-display {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.month-quick-btns {
+  display: flex;
+  gap: 4px;
+}
+.month-quick-btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.month-quick-btn.active { background: var(--primary); color: white; }
+
+/* ==================== PIE/SHARE CHART ==================== */
+.share-chart-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+.share-canvas-wrap {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  position: relative;
+}
+.share-canvas-wrap canvas {
+  position: absolute;
+  inset: 0;
+}
+.share-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.share-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.share-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.share-legend-label { color: var(--text-secondary); flex: 1; }
+.share-legend-pct { font-weight: 700; color: var(--text); }
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-secondary);
+}
+.empty-icon { font-size: 48px; margin-bottom: 8px; }
+.empty-text { font-size: 14px; }
+
+/* ==================== TOGGLE / SWITCH ==================== */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-label { font-size: 14px; font-weight: 600; }
+.toggle-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.toggle-switch {
+  width: 48px; height: 28px;
+  background: var(--border);
+  border-radius: 14px;
+  position: relative;
+  transition: background 0.3s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.toggle-switch.on { background: var(--primary); }
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 22px; height: 22px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.on::after { transform: translateX(20px); }
+
+/* ==================== ADMIN PANEL ==================== */
+.admin-section {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.admin-row:last-child { border-bottom: none; padding-bottom: 0; }
+.admin-label { font-size: 14px; font-weight: 600; }
+.admin-value { font-size: 14px; font-weight: 700; color: var(--primary); }
+.admin-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.admin-action-btn {
+  height: 44px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--text);
+}
+.admin-action-btn:active { transform: scale(0.97); background: var(--bg); }
+.admin-action-btn.danger { color: var(--danger); border-color: var(--danger); }
+.admin-action-btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* ==================== LINK SHARING ==================== */
+.link-box {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+  word-break: break-all;
+  color: var(--primary);
+  font-family: monospace;
+  border: 1px dashed var(--primary);
+  margin-top: 8px;
+}
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ==================== PRINT ==================== */
+@media print {
+  body { background: white; }
+  .app-header, .tab-bar, .export-actions, .modal-overlay { display: none !important; }
+  .app-container { max-width: 100%; }
+  .main-content { padding: 0; }
+}
+
+/* ==================== ANDROID STATUS BAR ==================== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .app-header { padding-top: calc(16px + env(safe-area-inset-top)); }
+}
+
+/* ==================== LOADING ==================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 999;
+  transition: opacity 0.5s;
+}
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--text-secondary); font-weight: 600; }
+
+/* ==================== HIDDEN ==================== */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">正在加载数据...</div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification"></div>
+
+<!-- Main App Container -->
+<div class="app-container" id="appContainer" style="display:none;">
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div class="login-page" id="loginPage">
+    <div class="login-logo">🏪</div>
+    <div class="login-title">常州图文快印</div>
+    <div class="login-subtitle">4门店日销售协作报表系统</div>
+    <div class="login-card">
+      <button class="login-role-btn primary" id="adminLoginBtn" onclick="showAdminLogin()">
+        <span class="login-role-icon">🔑</span>
+        <span class="login-role-text">
+          管理员登录<br><span class="login-role-desc">查看所有门店数据、汇总报表、导出报表</span>
+        </span>
+      </button>
+      <button class="login-role-btn" id="employeeLoginBtn" onclick="showEmployeeLogin()">
+        <span class="login-role-icon">👤</span>
+        <span class="login-role-text">
+          门店员工入口<br><span class="login-role-desc">扫码进入专属填写页面</span>
+        </span>
+      </button>
+    </div>
+    <div class="login-qr-hint">员工扫码 → 自动识别门店 → 直接填写</div>
+    <div class="login-footer">常州图文快印 · 数据驱动经营</div>
+  </div>
+
+  <!-- ===== ADMIN MAIN INTERFACE ===== -->
+  <div id="adminInterface" style="display:none; flex-direction:column; flex:1;">
+
+    <!-- Header -->
+    <header class="app-header" id="adminHeader">
+      <div class="header-top">
+        <div>
+          <div class="header-title">📊 常州图文快印</div>
+          <div class="header-subtitle">
+            <span>🔑 管理员模式</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" onclick="openMonthPicker()" title="选择月份">📅</button>
+          <button class="icon-btn" onclick="showSettings()" title="设置">⚙️</button>
+          <button class="icon-btn" onclick="logout()" title="退出">🚪</button>
+        </div>
+      </div>
+      <div class="date-nav">
+        <button class="date-nav-btn" onclick="changeDate(-1)">◀</button>
+        <div class="date-display" id="dateDisplay" onclick="openDatePicker()"></div>
+        <button class="date-nav-btn" onclick="changeDate(1)">▶</button>
+        <div class="quick-dates">
+          <button class="quick-date-btn" id="todayBtn" onclick="goToToday()">今天</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <!-- Page: Overview -->
+      <div class="page active" id="pageOverview">
+        <div class="summary-row" id="summaryRow">
+          <div class="summary-card blue">
+            <div class="summary-card-value" id="totalSalesValue">¥0</div>
+            <div class="summary-card-label">当日总销售额</div>
+          </div>
+          <div class="summary-card green">
+            <div class="summary-card-value" id="totalMemberValue">¥0</div>
+            <div class="summary-card-label">会员消费</div>
+          </div>
+          <div class="summary-card orange">
+            <div class="summary-card-value" id="totalOrdersValue">0</div>
+            <div class="summary-card-label">总订单数</div>
+          </div>
+        </div>
+
+        <div class="section-title">🏪 各门店数据</div>
+        <div class="store-cards" id="storeCards"></div>
+
+        <div class="section-title">📈 当月汇总（<span id="currentMonthLabel"></span>）</div>
+        <div class="summary-row">
+          <div class="summary-card blue">
+            <div class="summary-card-value" id="monthSalesValue">¥0</div>
+            <div class="summary-card-label">月销售额</div>
+          </div>
+          <div class="summary-card green">
+            <div class="summary-card-value" id="monthMemberValue">¥0</div>
+            <div class="summary-card-label">月会员消费</div>
+          </div>
+          <div class="summary-card orange">
+            <div class="summary-card-value" id="monthDaysValue">0</div>
+            <div class="summary-card-label">已填天数</div>
+          </div>
+        </div>
+
+        <div class="section-title">🔗 员工访问链接</div>
+        <div class="admin-section" id="employeeLinks">
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">各门店员工扫码直接进入填写页面</div>
+          <div id="linksList"></div>
+        </div>
+      </div>
+
+      <!-- Page: Entry -->
+      <div class="page" id="pageEntry">
+        <div class="section-title">📝 今日数据录入 · <span id="entryStoreFilter"></span></div>
+        <div id="entryForms"></div>
+      </div>
+
+      <!-- Page: Charts -->
+      <div class="page" id="pageCharts">
+        <div class="month-nav">
+          <button class="month-nav-btn" onclick="changeMonth(-1)">◀</button>
+          <div class="month-nav-display" id="chartMonthDisplay"></div>
+          <button class="month-nav-btn" onclick="changeMonth(1)">▶</button>
+          <div class="month-quick-btns">
+            <button class="month-quick-btn" onclick="goToCurrentMonth()">本月</button>
+          </div>
+        </div>
+
+        <div class="section-title">📊 月度门店销售占比</div>
+        <div class="chart-container">
+          <div class="share-chart-wrap" id="shareChartWrap">
+            <div class="share-canvas-wrap">
+              <canvas id="shareChart" width="240" height="240"></canvas>
+            </div>
+            <div class="share-legend" id="shareLegend"></div>
+          </div>
+        </div>
+
+        <div class="section-title">📊 各门店月销售额对比</div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">柱状图 <span style="font-weight:400; color:var(--text-secondary); font-size:12px;">（单位：元）</span></div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="barChart" width="900" height="440"></canvas>
+          </div>
+        </div>
+
+        <div class="section-title">📈 月度每日销售趋势</div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">折线图 <span style="font-weight:400; color:var(--text-secondary); font-size:12px;">（单位：元）</span></div>
+          </div>
+          <div class="chart-canvas-wrap tall">
+            <canvas id="lineChart" width="900" height="520"></canvas>
+          </div>
+          <div class="chart-legend" id="lineLegend"></div>
+        </div>
+
+        <div class="section-title">📋 月度数据明细</div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="monthTable">
+            <thead><tr><th>门店</th><th>销售额</th><th>会员消费</th><th>订单数</th></tr></thead>
+            <tbody id="monthTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Page: Export -->
+      <div class="page" id="pageExport">
+        <div class="month-nav" style="margin-bottom:12px;">
+          <button class="month-nav-btn" onclick="changeExportMonth(-1)">◀</button>
+          <div class="month-nav-display" id="exportMonthDisplay"></div>
+          <button class="month-nav-btn" onclick="changeExportMonth(1)">▶</button>
+          <div class="month-quick-btns">
+            <button class="month-quick-btn" onclick="goToExportCurrentMonth()">本月</button>
+          </div>
+        </div>
+
+        <div class="section-title">🖨️ A4报表预览</div>
+        <div class="export-preview" id="exportPreview">
+          <div class="report-paper" id="reportPaper">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="export-actions">
+          <button class="export-btn primary" onclick="exportPDF()">
+            📄 导出PDF
+          </button>
+          <button class="export-btn secondary" onclick="exportImage()">
+            🖼️ 导出图片
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" id="tabBar">
+      <button class="tab-item active" onclick="switchTab('overview')" id="tabOverview">
+        <span class="tab-icon">📊</span>
+        <span>总览</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('entry')" id="tabEntry">
+        <span class="tab-icon">📝</span>
+        <span>录入</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('charts')" id="tabCharts">
+        <span class="tab-icon">📈</span>
+        <span>图表</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('export')" id="tabExport">
+        <span class="tab-icon">🖨️</span>
+        <span>导出</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ===== EMPLOYEE INTERFACE ===== -->
+  <div id="employeeInterface" style="display:none; flex-direction:column; flex:1;">
+
+    <header class="app-header" id="employeeHeader">
+      <div class="header-top">
+        <div>
+          <div class="header-title" id="empStoreTitle">门店数据录入</div>
+          <div class="header-subtitle">
+            <span class="header-role-badge">👤 门店员工</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" onclick="empLogout()">🚪</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="section-title">📝 每日数据填写</div>
+      <div id="empDateNav" class="date-nav" style="margin-bottom:12px;">
+        <button class="date-nav-btn" onclick="empChangeDate(-1)">◀</button>
+        <div class="date-display" id="empDateDisplay" onclick="empOpenDatePicker()"></div>
+        <button class="date-nav-btn" onclick="empChangeDate(1)">▶</button>
+        <div class="quick-dates">
+          <button class="quick-date-btn" id="empTodayBtn" onclick="empGoToToday()">今天</button>
+        </div>
+      </div>
+      <div id="empEntryForm"></div>
+    </main>
+  </div>
+
+</div>
+
+<!-- Date Picker Modal -->
+<div class="modal-overlay" id="datePickerModal" onclick="if(event.target===this)closeDatePicker()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">选择日期</div>
+    <div id="calendarGrid"></div>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button class="export-btn secondary" onclick="closeDatePicker()" style="flex:1;">取消</button>
+      <button class="export-btn primary" onclick="closeDatePicker()" style="flex:1;">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Month Picker Modal -->
+<div class="modal-overlay" id="monthPickerModal" onclick="if(event.target===this)closeMonthPicker()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">选择月份</div>
+    <div class="month-list" id="monthList"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ 系统设置</div>
+    
+    <!-- Cloud Sync Section -->
+    <div class="admin-section">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div style="font-size:15px; font-weight:700;">☁️ 云端同步</div>
+        <span id="supabaseStatus" style="font-size:12px; font-weight:700; color:var(--text-secondary);">未配置</span>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">🔗 Supabase URL</label>
+        <input type="text" class="form-input" id="supabaseUrl" placeholder="https://xxx.supabase.co" 
+               style="height:42px; font-size:14px;" onchange="saveSupabaseConfig()">
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">🔑 API Key (anon public)</label>
+        <input type="text" class="form-input" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIs..." 
+               style="height:42px; font-size:14px;" onchange="saveSupabaseConfig()">
+      </div>
+      <button class="save-btn" id="connectBtn" onclick="connectSupabase()" style="height:44px; margin-top:8px; font-size:14px;">
+        🔌 连接 Supabase
+      </button>
+    </div>
+
+    <!-- Local Storage Section -->
+    <div class="admin-section">
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">📦 本地存储</div>
+          <div class="admin-desc" style="font-size:12px; color:var(--text-secondary); margin-top:2px;">IndexedDB（始终启用）</div>
+        </div>
+        <span style="font-size:12px; color:var(--success); font-weight:700;">✓ 正常</span>
+      </div>
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">☁️ 云端同步</div>
+          <div class="admin-desc" style="font-size:12px; color:var(--text-secondary); margin-top:2px;" id="cloudSyncDesc">本地优先，云端同步</div>
+        </div>
+        <span id="syncStatusBadge" style="font-size:12px; color:var(--text-secondary); font-weight:700;">—</span>
+      </div>
+    </div>
+    
+    <div class="admin-actions">
+      <button class="admin-action-btn" onclick="exportData()">📤 导出数据</button>
+      <button class="admin-action-btn" onclick="document.getElementById('importFileInput').click()">📥 导入数据</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="admin-action-btn danger" onclick="clearAllData()">🗑️ 清空数据</button>
+    </div>
+    <div style="margin-top:16px; padding:12px; background:#FEF2F2; border-radius:var(--radius-sm); border:1px solid #FECACA;">
+      <div style="font-size:13px; font-weight:700; color:var(--danger); margin-bottom:4px;">⚠️ 警告</div>
+      <div style="font-size:12px; color:#991B1B;">清空数据将删除所有销售记录，此操作不可恢复！</div>
+    </div>
+  </div>
+</div>
+
+<!-- Employee Store Selection Modal -->
+<div class="modal-overlay" id="empStoreModal" onclick="if(event.target===this)closeEmpStoreModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">选择您的门店</div>
+    <div class="store-picker" id="empStorePicker"></div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIGURATION =====
+const STORES = [
+  { id: 'downtown', name: '市区店', emoji: '🏙️', color: '#2563EB', hasMember: true },
+  { id: 'newzone', name: '新区店', emoji: '🏢', color: '#10B981', hasMember: true },
+  { id: 'hutang', name: '湖塘店', emoji: '🏡', color: '#F59E0B', hasMember: true },
+  { id: 'factory', name: '工厂店', emoji: '🏭', color: '#8B5CF6', hasMember: false },
+];
+
+// ===== STATE =====
+let currentDate = formatDate(new Date());
+let currentMonth = getYearMonth(new Date());
+let chartMonth = getYearMonth(new Date());
+let exportMonth = getYearMonth(new Date());
+let currentRole = null; // 'admin' | 'employee'
+let currentEmpStore = null;
+let isEmployeeMode = false; // 门店员工模式限制 - 防止切换到管理员
+let allRecords = {};
+let isEditing = false;
+
+// ===== UTILITIES =====
+function formatDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function formatDateCN(d) {
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+  return `${m}月${day}日 ${weekdays[d.getDay()]}`;
+}
+function getYearMonth(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function getMonthLabel(ym) {
+  const [y, m] = ym.split('-');
+  return `${y}年${m}月`;
+}
+function parseDate(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function today() { return formatDate(new Date()); }
+function currentYM() { return getYearMonth(new Date()); }
+function fmtMoney(n) {
+  if (n >= 10000) return `¥${(n/10000).toFixed(1)}万`;
+  return `¥${n.toLocaleString()}`;
+}
+function fmtMoneyRaw(n) {
+  return `¥${n.toLocaleString()}`;
+}
+
+// ===== LOCAL STORAGE (IndexedDB) =====
+const DB_NAME = 'changzhou_print_db';
+const DB_VERSION = 1;
+const STORE_RECORDS = 'daily_records';
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      if (!database.objectStoreNames.contains(STORE_RECORDS)) {
+        database.createObjectStore(STORE_RECORDS, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// ===== SUPABASE CONFIGURATION =====
+let supabaseConfig = {
+  url: '',
+  key: '',
+  enabled: false
+};
+
+function loadSupabaseConfig() {
+  try {
+    const saved = localStorage.getItem('supabase_config');
+    if (saved) {
+      supabaseConfig = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.log('No saved Supabase config');
+  }
+  updateSupabaseStatus();
+}
+
+function saveSupabaseConfig() {
+  supabaseConfig.url = document.getElementById('supabaseUrl').value.trim();
+  supabaseConfig.key = document.getElementById('supabaseKey').value.trim();
+  localStorage.setItem('supabase_config', JSON.stringify(supabaseConfig));
+}
+
+async function connectSupabase() {
+  const url = document.getElementById('supabaseUrl').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+  
+  if (!url || !key) {
+    showNotification('请填写完整的 Supabase 配置', 'error');
+    return;
+  }
+  
+  // Save config
+  supabaseConfig.url = url;
+  supabaseConfig.key = key;
+  localStorage.setItem('supabase_config', JSON.stringify(supabaseConfig));
+  
+  const btn = document.getElementById('connectBtn');
+  btn.textContent = '🔄 连接中...';
+  btn.disabled = true;
+  
+  // Direct fetch test
+  fetch(`${url}/rest/v1/daily_records?limit=1`, {
+    method: 'GET',
+    headers: {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`
+    }
+  })
+  .then(res => {
+    btn.disabled = false;
+    
+    if (!res.ok) {
+      return res.json().then(err => Promise.reject(err));
+    }
+    
+    supabaseConfig.enabled = true;
+    localStorage.setItem('supabase_config', JSON.stringify(supabaseConfig));
+    
+    btn.textContent = '✅ 已连接';
+    btn.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+    
+    updateSupabaseStatus();
+    showNotification('☁️ Supabase 连接成功！', 'success');
+    
+    // Try to sync from cloud
+    syncFromCloudDirect();
+  })
+  .catch(e => {
+    btn.disabled = false;
+    btn.textContent = '🔌 连接 Supabase';
+    // Show more detailed error
+    let errMsg = e.message || JSON.stringify(e);
+    if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+      errMsg = '网络错误：请检查 Supabase URL 是否正确，或浏览器是否阻止了请求';
+    }
+    showNotification('连接失败: ' + errMsg, 'error');
+    console.error('Supabase connection error:', e);
+  });
+}
+
+// Direct cloud sync functions (no supabase client needed)
+async function syncFromCloudDirect() {
+  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) return;
+  
+  try {
+    const res = await fetch(`${supabaseConfig.url}/rest/v1/daily_records`, {
+      method: 'GET',
+      headers: {
+        'apikey': supabaseConfig.key,
+        'Authorization': `Bearer ${supabaseConfig.key}`
+      }
+    });
+    
+    if (!res.ok) return;
+    
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      data.forEach(cloudRec => {
+        const localRec = allRecords[cloudRec.id];
+        const cloudTime = cloudRec.updated_at || 0;
+        const localTime = localRec?.updated_at || 0;
+        
+        if (!localRec || cloudTime > localTime) {
+          allRecords[cloudRec.id] = cloudRec;
+          // Save to local IndexedDB
+          if (db) {
+            const tx = db.transaction(STORE_RECORDS, 'readwrite');
+            tx.objectStore(STORE_RECORDS).put(cloudRec);
+          }
+        }
+      });
+      
+      if (data.length > 0) {
+        showNotification(`☁️ 已同步 ${data.length} 条云端记录`, 'success');
+        refreshAdminView();
+      }
+    }
+  } catch (e) {
+    console.log('Cloud sync error:', e.message);
+  }
+}
+
+async function saveToCloud(record) {
+  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) return;
+  
+  try {
+    const cloudRec = {
+      id: record.id,
+      date: record.date,
+      store_id: record.storeId,
+      sales: record.sales || 0,
+      member_sales: record.memberSales || 0,
+      order_count: record.orderCount || 0,
+      month: record.month,
+      updated_at: record.updatedAt || Date.now()
+    };
+    
+    await fetch(`${supabaseConfig.url}/rest/v1/daily_records`, {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseConfig.key,
+        'Authorization': `Bearer ${supabaseConfig.key}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(cloudRec)
+    });
+  } catch (e) {
+    console.log('Cloud save error:', e.message);
+  }
+}
+
+function updateSupabaseStatus() {
+  const statusEl = document.getElementById('supabaseStatus');
+  const syncBadge = document.getElementById('syncStatusBadge');
+  const cloudDesc = document.getElementById('cloudSyncDesc');
+  
+  if (supabaseConfig.enabled) {
+    statusEl.textContent = '✓ 已连接';
+    statusEl.style.color = 'var(--success)';
+    syncBadge.textContent = '已启用';
+    syncBadge.style.color = 'var(--success)';
+    cloudDesc.textContent = '数据将同步到云端';
+  } else {
+    statusEl.textContent = '未配置';
+    statusEl.style.color = 'var(--text-secondary)';
+    syncBadge.textContent = '—';
+    syncBadge.style.color = 'var(--text-secondary)';
+    cloudDesc.textContent = '本地优先，云端同步';
+  }
+  
+  // Fill in saved config
+  if (supabaseConfig.url) document.getElementById('supabaseUrl').value = supabaseConfig.url;
+  if (supabaseConfig.key) document.getElementById('supabaseKey').value = supabaseConfig.key;
+}
+
+// ===== DATA OPERATIONS =====
+async function saveRecord(record) {
+  // Save to local IndexedDB
+  return new Promise((resolve, reject) => {
+    if (!db) { resolve(); return; }
+    const tx = db.transaction(STORE_RECORDS, 'readwrite');
+    const store = tx.objectStore(STORE_RECORDS);
+    record.month = getYearMonth(parseDate(record.date));
+    const req = store.put(record);
+    req.onsuccess = () => { 
+      allRecords[record.id] = record; 
+      // Also save to cloud (async, don't wait)
+      saveToCloud(record);
+      resolve(); 
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getRecord(id) {
+  return new Promise((resolve) => {
+    if (!db) { resolve(allRecords[id] || null); return; }
+    const tx = db.transaction(STORE_RECORDS, 'readonly');
+    const store = tx.objectStore(STORE_RECORDS);
+    const req = store.get(id);
+    req.onsuccess = () => resolve(req.result || allRecords[id] || null);
+    req.onerror = () => resolve(allRecords[id] || null);
+  });
+}
+
+async function getAllRecords() {
+  return new Promise((resolve, reject) => {
+    if (!db) { resolve({}); return; }
+    const tx = db.transaction(STORE_RECORDS, 'readonly');
+    const store = tx.objectStore(STORE_RECORDS);
+    const req = store.getAll();
+    req.onsuccess = () => {
+      const records = {};
+      req.result.forEach(r => records[r.id] = r);
+      allRecords = records;
+      resolve(records);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function clearAllRecords() {
+  return new Promise((resolve, reject) => {
+    if (!db) { allRecords = {}; resolve(); return; }
+    const tx = db.transaction(STORE_RECORDS, 'readwrite');
+    const store = tx.objectStore(STORE_RECORDS);
+    const req = store.clear();
+    req.onsuccess = () => { allRecords = {}; resolve(); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getRecordsByMonth(month) {
+  const all = await getAllRecords();
+  const filtered = {};
+  Object.values(all).forEach(r => {
+    if (r.month === month) filtered[r.id] = r;
+  });
+  return filtered;
+}
+
+// ===== NOTIFICATION =====
+function showNotification(msg, type = '') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification' + (type ? ' ' + type : '');
+  setTimeout(() => el.classList.add('show'), 10);
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ===== LOGIN =====
+function showAdminLogin() {
+  currentRole = 'admin';
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('adminInterface').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'flex';
+  initAdmin();
+  registerSW();
+}
+
+function showEmployeeLogin() {
+  // Show store picker
+  const picker = document.getElementById('empStorePicker');
+  picker.innerHTML = STORES.map(s => `
+    <button class="store-select-btn" style="border-color:${s.color};" onclick="selectEmpStore('${s.id}')">
+      <span class="emoji">${s.emoji}</span>
+      <span style="color:${s.color};">${s.name}</span>
+    </button>
+  `).join('');
+  document.getElementById('empStoreModal').classList.add('active');
+}
+
+// 更新登录页面显示 - 门店员工模式限制
+function updateLoginPageDisplay() {
+  const adminBtn = document.getElementById('adminLoginBtn');
+  const empBtn = document.getElementById('employeeLoginBtn');
+  const qrHint = document.querySelector('.login-qr-hint');
+
+  if (isEmployeeMode) {
+    // 门店员工模式：隐藏管理员登录入口
+    adminBtn.style.display = 'none';
+    empBtn.classList.add('primary');
+    if (qrHint) qrHint.style.display = 'none';
+  } else {
+    // 正常模式：显示所有入口
+    adminBtn.style.display = 'flex';
+    empBtn.classList.remove('primary');
+    if (qrHint) qrHint.style.display = 'block';
+  }
+}
+
+function selectEmpStore(storeId) {
+  currentRole = 'employee';
+  currentEmpStore = STORES.find(s => s.id === storeId);
+  isEmployeeMode = true; // 设置员工模式限制
+  closeEmpStoreModal();
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('employeeInterface').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'flex';
+  document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
+  initEmployee();
+  registerSW();
+}
+
+function closeEmpStoreModal() {
+  document.getElementById('empStoreModal').classList.remove('active');
+}
+
+function logout() {
+  currentRole = null;
+  isEmployeeMode = false; // 管理员退出后允许切换
+  document.getElementById('adminInterface').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  updateLoginPageDisplay(); // 更新登录页面显示
+}
+
+function empLogout() {
+  currentRole = null;
+  currentEmpStore = null;
+  isEmployeeMode = true; // 保持员工模式限制，防止切换到管理员
+  document.getElementById('employeeInterface').style.display = 'none';
+  showEmployeeLogin(); // 直接显示员工登录
+}
+
+// ===== ADMIN INIT =====
+async function initAdmin() {
+  updateDateDisplay();
+  updateEmployeeLinks();
+  await refreshAdminView();
+}
+
+async function refreshAdminView() {
+  await loadAllRecords();
+  updateSummaryCards();
+  updateStoreCards();
+  updateMonthSummary();
+  renderCharts();
+  renderExportReport();
+}
+
+// ===== DATA LOAD =====
+async function loadAllRecords() {
+  allRecords = await getAllRecords();
+}
+
+function getRecordForDateStore(date, storeId) {
+  return allRecords[`${date}_${storeId}`] || null;
+}
+
+function getDayRecords(date) {
+  const result = {};
+  STORES.forEach(s => {
+    result[s.id] = getRecordForDateStore(date, s.id);
+  });
+  return result;
+}
+
+function getMonthRecords(month) {
+  const result = {};
+  STORES.forEach(s => result[s.id] = []);
+  Object.values(allRecords).forEach(r => {
+    if (r.month === month) {
+      result[r.storeId].push(r);
+    }
+  });
+  return result;
+}
+
+// ===== SUMMARY CARDS =====
+function updateSummaryCards() {
+  const dayRecs = getDayRecords(currentDate);
+  let totalSales = 0, totalMember = 0, totalOrders = 0;
+  STORES.forEach(s => {
+    const r = dayRecs[s.id];
+    if (r) {
+      totalSales += r.sales || 0;
+      totalMember += r.memberSales || 0;
+      totalOrders += r.orderCount || 0;
+    }
+  });
+  document.getElementById('totalSalesValue').textContent = fmtMoney(totalSales);
+  document.getElementById('totalMemberValue').textContent = fmtMoney(totalMember);
+  document.getElementById('totalOrdersValue').textContent = totalOrders.toLocaleString();
+}
+
+function updateMonthSummary() {
+  const monthRecs = getMonthRecords(currentMonth);
+  let totalSales = 0, totalMember = 0, totalDays = new Set();
+  const storeTotals = {};
+  STORES.forEach(s => storeTotals[s.id] = { sales: 0, memberSales: 0, orders: 0 });
+
+  Object.values(monthRecs).forEach(recs => {
+    recs.forEach(r => {
+      totalSales += r.sales || 0;
+      totalMember += r.memberSales || 0;
+      totalDays.add(r.date);
+      storeTotals[r.storeId].sales += r.sales || 0;
+      storeTotals[r.storeId].memberSales += r.memberSales || 0;
+      storeTotals[r.storeId].orders += r.orderCount || 0;
+    });
+  });
+
+  document.getElementById('monthSalesValue').textContent = fmtMoney(totalSales);
+  document.getElementById('monthMemberValue').textContent = fmtMoney(totalMember);
+  document.getElementById('monthDaysValue').textContent = `${totalDays.size}天`;
+  document.getElementById('currentMonthLabel').textContent = getMonthLabel(currentMonth);
+}
+
+// ===== STORE CARDS =====
+function updateStoreCards() {
+  const container = document.getElementById('storeCards');
+  const dayRecs = getDayRecords(currentDate);
+
+  container.innerHTML = STORES.map(s => {
+    const r = dayRecs[s.id];
+    const filled = r && (r.sales > 0 || r.orderCount > 0);
+    return `
+      <div class="store-card ${s.id} ${filled ? '' : 'empty'}" onclick="openEntryForStore('${s.id}')">
+        <div class="store-card-header">
+          <div class="store-name">
+            <span class="store-dot ${s.id}"></span>
+            ${s.emoji} ${s.name}
+          </div>
+          <span class="store-badge ${filled ? 'badge-filled' : 'badge-empty'}">
+            ${filled ? '✓已填' : '未填'}
+          </span>
+        </div>
+        <div class="store-stats">
+          <div class="store-stat">
+            <span class="store-stat-label">销售额</span>
+            <span class="store-stat-value highlight">${r ? fmtMoneyRaw(r.sales || 0) : '¥0'}</span>
+          </div>
+          ${s.hasMember ? `
+          <div class="store-stat">
+            <span class="store-stat-label">会员消费</span>
+            <span class="store-stat-value">${r ? fmtMoneyRaw(r.memberSales || 0) : '¥0'}</span>
+          </div>` : ''}
+          <div class="store-stat">
+            <span class="store-stat-label">订单数</span>
+            <span class="store-stat-value">${r ? (r.orderCount || 0) : 0} 单</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== ENTRY FORMS =====
+function updateDateDisplay() {
+  const d = parseDate(currentDate);
+  document.getElementById('dateDisplay').textContent = formatDateCN(d);
+  const todayBtn = document.getElementById('todayBtn');
+  todayBtn.classList.toggle('active', currentDate === today());
+}
+
+function changeDate(delta) {
+  const d = parseDate(currentDate);
+  d.setDate(d.getDate() + delta);
+  currentDate = formatDate(d);
+  updateDateDisplay();
+  updateSummaryCards();
+  updateStoreCards();
+  updateEntryForms();
+}
+
+function goToToday() {
+  currentDate = today();
+  updateDateDisplay();
+  updateSummaryCards();
+  updateStoreCards();
+  updateEntryForms();
+}
+
+function openEntryForStore(storeId) {
+  switchTab('entry');
+  currentEntryStore = storeId;
+  updateEntryForms();
+  document.getElementById('entryStoreFilter').textContent = STORES.find(s=>s.id===storeId)?.name || '全部';
+}
+
+// ===== ADMIN ENTRY FORMS =====
+let currentEntryStore = null;
+
+function updateEntryForms() {
+  const container = document.getElementById('entryForms');
+  const dayRecs = getDayRecords(currentDate);
+  const stores = currentEntryStore ? STORES.filter(s => s.id === currentEntryStore) : STORES;
+
+  container.innerHTML = stores.map(s => {
+    const r = dayRecs[s.id] || {};
+    return `
+      <div class="form-section" style="border-left:3px solid ${s.color};">
+        <div class="form-section-header">
+          <span class="form-section-title">${s.emoji} ${s.name}</span>
+          <span class="store-badge ${(r && (r.sales>0||r.orderCount>0)) ? 'badge-filled' : 'badge-empty'}">
+            ${(r && (r.sales>0||r.orderCount>0)) ? '✓已填' : '待填写'}
+          </span>
+        </div>
+        <div class="form-grid ${s.hasMember ? 'cols-3' : ''}">
+          <div class="form-group">
+            <label class="form-label">💰 销售额</label>
+            <div class="form-input-wrap">
+              <span class="form-prefix">¥</span>
+              <input type="number" class="form-input has-prefix" id="sales_${s.id}"
+                value="${r.sales || ''}" placeholder="0"
+                min="0" inputmode="decimal" oninput="markEdited('${s.id}')">
+            </div>
+          </div>
+          ${s.hasMember ? `
+          <div class="form-group">
+            <label class="form-label">💳 会员消费</label>
+            <div class="form-input-wrap">
+              <span class="form-prefix">¥</span>
+              <input type="number" class="form-input has-prefix" id="member_${s.id}"
+                value="${r.memberSales || ''}" placeholder="0"
+                min="0" inputmode="decimal" oninput="markEdited('${s.id}')">
+            </div>
+          </div>` : ''}
+          <div class="form-group">
+            <label class="form-label">📋 订单数量</label>
+            <div class="form-input-wrap">
+              <span class="form-suffix">单</span>
+              <input type="number" class="form-input has-suffix" id="orders_${s.id}"
+                value="${r.orderCount || ''}" placeholder="0"
+                min="0" inputmode="numeric" oninput="markEdited('${s.id}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') + `
+    <button class="save-btn" id="saveBtn" onclick="saveAllRecords()">
+      💾 保存今日数据
+    </button>
+  `;
+}
+
+function markEdited(storeId) {
+  isEditing = true;
+  const btn = document.getElementById('saveBtn');
+  if (btn && !btn.classList.contains('success')) {
+    btn.style.background = 'linear-gradient(135deg, #F59E0B, #D97706)';
+    btn.textContent = '🔔 有未保存的修改';
+  }
+}
+
+async function saveAllRecords() {
+  const stores = currentEntryStore ? STORES.filter(s => s.id === currentEntryStore) : STORES;
+  let saved = 0;
+  for (const s of stores) {
+    const sales = parseFloat(document.getElementById(`sales_${s.id}`)?.value) || 0;
+    const memberSales = s.hasMember ? (parseFloat(document.getElementById(`member_${s.id}`)?.value) || 0) : 0;
+    const orders = parseInt(document.getElementById(`orders_${s.id}`)?.value) || 0;
+
+    const record = {
+      id: `${currentDate}_${s.id}`,
+      date: currentDate,
+      storeId: s.id,
+      sales, memberSales, orderCount: orders,
+      updatedAt: Date.now()
+    };
+    await saveRecord(record);
+    allRecords[record.id] = record;
+    saved++;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('success');
+  btn.textContent = `✅ 已保存 ${saved} 个门店`;
+  setTimeout(() => {
+    btn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+    btn.textContent = '💾 保存今日数据';
+    btn.classList.remove('success');
+  }, 2500);
+
+  updateSummaryCards();
+  updateStoreCards();
+  updateMonthSummary();
+  showNotification(`✅ ${saved}个门店数据已保存`, 'success');
+}
+
+// ===== EMPLOYEE INTERFACE =====
+function initEmployee() {
+  updateEmpDateDisplay();
+  updateEmpEntryForm();
+}
+
+function updateEmpDateDisplay() {
+  const d = parseDate(currentDate);
+  document.getElementById('empDateDisplay').textContent = formatDateCN(d);
+  const todayBtn = document.getElementById('empTodayBtn');
+  if (todayBtn) todayBtn.classList.toggle('active', currentDate === today());
+}
+
+function empChangeDate(delta) {
+  const d = parseDate(currentDate);
+  d.setDate(d.getDate() + delta);
+  currentDate = formatDate(d);
+  updateEmpDateDisplay();
+  updateEmpEntryForm();
+}
+
+function empGoToToday() {
+  currentDate = today();
+  updateEmpDateDisplay();
+  updateEmpEntryForm();
+}
+
+function empOpenDatePicker() {
+  openDatePicker();
+}
+
+async function updateEmpEntryForm() {
+  const container = document.getElementById('empEntryForm');
+  const r = await getRecord(`${currentDate}_${currentEmpStore.id}`);
+  const s = currentEmpStore;
+
+  container.innerHTML = `
+    <div class="form-section" style="border-left:3px solid ${s.color};">
+      <div class="form-section-header">
+        <span class="form-section-title">${s.emoji} ${s.name}</span>
+        <span class="store-badge ${(r&&(r.sales>0||r.orderCount>0))?'badge-filled':'badge-empty'}">
+          ${(r&&(r.sales>0||r.orderCount>0))?'✓已填':'待填写'}
+        </span>
+      </div>
+      <div class="form-grid ${s.hasMember?'cols-3':''}">
+        <div class="form-group">
+          <label class="form-label">💰 销售额</label>
+          <div class="form-input-wrap">
+            <span class="form-prefix">¥</span>
+            <input type="number" class="form-input has-prefix" id="emp_sales"
+              value="${r?.sales||''}" placeholder="0" min="0" inputmode="decimal">
+          </div>
+        </div>
+        ${s.hasMember?`
+        <div class="form-group">
+          <label class="form-label">💳 会员消费</label>
+          <div class="form-input-wrap">
+            <span class="form-prefix">¥</span>
+            <input type="number" class="form-input has-prefix" id="emp_member"
+              value="${r?.memberSales||''}" placeholder="0" min="0" inputmode="decimal">
+          </div>
+        </div>`:''}
+        <div class="form-group">
+          <label class="form-label">📋 订单数量</label>
+          <div class="form-input-wrap">
+            <span class="form-suffix">单</span>
+            <input type="number" class="form-input has-suffix" id="emp_orders"
+              value="${r?.orderCount||''}" placeholder="0" min="0" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" id="empSaveBtn" onclick="empSave()">
+      💾 提交数据
+    </button>
+    <div style="text-align:center; margin-top:12px; font-size:12px; color:var(--text-secondary);">
+      数据将自动同步到管理员总报表 📊
+    </div>
+  `;
+}
+
+async function empSave() {
+  const sales = parseFloat(document.getElementById('emp_sales')?.value) || 0;
+  const memberSales = currentEmpStore.hasMember ? (parseFloat(document.getElementById('emp_member')?.value) || 0) : 0;
+  const orders = parseInt(document.getElementById('emp_orders')?.value) || 0;
+
+  const record = {
+    id: `${currentDate}_${currentEmpStore.id}`,
+    date: currentDate,
+    storeId: currentEmpStore.id,
+    sales, memberSales, orderCount: orders,
+    updatedAt: Date.now()
+  };
+  await saveRecord(record);
+  allRecords[record.id] = record;
+
+  const btn = document.getElementById('empSaveBtn');
+  btn.classList.add('success');
+  btn.textContent = '✅ 数据已提交！';
+  setTimeout(() => {
+    btn.classList.remove('success');
+    btn.textContent = '💾 提交数据';
+  }, 2500);
+
+  updateEmpEntryForm();
+  showNotification(`${currentEmpStore.name}数据已提交 ✓`, 'success');
+}
+
+// ===== TAB NAVIGATION =====
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById(`page${capitalize(tab)}`).classList.add('active');
+  document.getElementById(`tab${capitalize(tab)}`).classList.add('active');
+
+  if (tab === 'charts') {
+    chartMonth = currentMonth;
+    updateChartMonthDisplay();
+    renderCharts();
+  }
+  if (tab === 'export') {
+    exportMonth = currentMonth;
+    updateExportMonthDisplay();
+    renderExportReport();
+  }
+  if (tab === 'entry') {
+    currentEntryStore = null;
+    document.getElementById('entryStoreFilter').textContent = '全部门店';
+    updateEntryForms();
+  }
+}
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ===== DATE PICKER =====
+let datePickerMode = 'admin';
+
+function openDatePicker(mode = 'admin') {
+  datePickerMode = mode;
+  renderCalendar(currentDate);
+  document.getElementById('datePickerModal').classList.add('active');
+}
+
+function renderCalendar(dateStr) {
+  const grid = document.getElementById('calendarGrid');
+  const d = parseDate(dateStr);
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr = today();
+
+  const weekdays = ['日','一','二','三','四','五','六'];
+  let html = `<div style="text-align:center; margin-bottom:8px; font-weight:700; font-size:16px;">${year}年${month+1}月</div>`;
+  html += '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center;">';
+  weekdays.forEach(w => { html += `<div style="font-size:11px; color:var(--text-secondary); font-weight:600; padding:6px 0;">${w}</div>`; });
+  for (let i = 0; i < firstDay; i++) { html += '<div></div>'; }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateVal = formatDate(new Date(year, month, day));
+    const isToday = dateVal === todayStr;
+    const isSelected = dateVal === currentDate;
+    html += `<button onclick="selectCalendarDate('${dateVal}')" style="
+      width:100%; aspect-ratio:1; border-radius:8px;
+      font-size:14px; font-weight:${isSelected?'700':'500'};
+      background:${isSelected?'var(--primary)':isToday?'var(--primary-light)':'transparent'};
+      color:${isSelected?'white':isToday?'var(--primary)':'var(--text)'};
+      border:1.5px solid ${isSelected?'var(--primary)':isToday?'var(--primary)':'transparent'};
+      transition:all 0.15s; display:flex; align-items:center; justify-content:center;
+    ">${day}</button>`;
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function selectCalendarDate(dateStr) {
+  currentDate = dateStr;
+  if (datePickerMode === 'admin') {
+    updateDateDisplay();
+    updateSummaryCards();
+    updateStoreCards();
+    updateEntryForms();
+  } else {
+    updateEmpDateDisplay();
+    updateEmpEntryForm();
+  }
+  closeDatePicker();
+}
+
+function closeDatePicker() {
+  document.getElementById('datePickerModal').classList.remove('active');
+}
+
+// ===== MONTH PICKER =====
+function openMonthPicker() {
+  const list = document.getElementById('monthList');
+  const now = new Date();
+  const months = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(getYearMonth(d));
+  }
+  list.innerHTML = months.map(m => `
+    <button class="month-btn ${m === currentMonth ? 'active' : ''}" onclick="selectMonth('${m}')">
+      ${getMonthLabel(m)}
+    </button>
+  `).join('');
+  document.getElementById('monthPickerModal').classList.add('active');
+}
+
+function closeMonthPicker() {
+  document.getElementById('monthPickerModal').classList.remove('active');
+}
+
+function selectMonth(month) {
+  currentMonth = month;
+  closeMonthPicker();
+  refreshAdminView();
+}
+
+// ===== CHART MONTH NAVIGATION =====
+function updateChartMonthDisplay() {
+  document.getElementById('chartMonthDisplay').textContent = getMonthLabel(chartMonth);
+}
+
+function changeMonth(delta) {
+  const [y, m] = chartMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  chartMonth = getYearMonth(d);
+  updateChartMonthDisplay();
+  renderCharts();
+}
+
+function goToCurrentMonth() {
+  chartMonth = currentYM();
+  updateChartMonthDisplay();
+  renderCharts();
+}
+
+// ===== CHARTS =====
+function renderCharts() {
+  renderShareChart();
+  renderBarChart();
+  renderLineChart();
+  renderMonthTable();
+}
+
+function getMonthData(month) {
+  const recs = getMonthRecords(month);
+  const data = {};
+  let totalSales = 0;
+  STORES.forEach(s => {
+    let sales = 0, memberSales = 0, orders = 0;
+    (recs[s.id] || []).forEach(r => {
+      sales += r.sales || 0;
+      memberSales += r.memberSales || 0;
+      orders += r.orderCount || 0;
+    });
+    data[s.id] = { sales, memberSales, orders };
+    totalSales += sales;
+  });
+  return { data, totalSales };
+}
+
+function renderShareChart() {
+  const canvas = document.getElementById('shareChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 240 * dpr;
+  canvas.height = 240 * dpr;
+  ctx.scale(dpr, dpr);
+
+  const { data, totalSales } = getMonthData(chartMonth);
+  const legend = document.getElementById('shareLegend');
+
+  if (totalSales === 0) {
+    ctx.clearRect(0, 0, 240, 240);
+    ctx.fillStyle = '#CBD5E1';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('暂无数据', 120, 125);
+    legend.innerHTML = '<div class="empty-state" style="padding:8px;">本月暂无数据</div>';
+    return;
+  }
+
+  const cx = 120, cy = 120, r = 90;
+  let startAngle = -Math.PI / 2;
+  const colors = STORES.map(s => s.color);
+
+  STORES.forEach((s, i) => {
+    const val = data[s.id]?.sales || 0;
+    const pct = totalSales > 0 ? val / totalSales : 0;
+    const endAngle = startAngle + pct * 2 * Math.PI;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+
+    startAngle = endAngle;
+  });
+
+  // Center hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+  ctx.fillStyle = '#1E293B';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`¥${(totalSales/10000).toFixed(1)}万`, cx, cy - 4);
+  ctx.font = '10px sans-serif';
+  ctx.fillStyle = '#64748B';
+  ctx.fillText('月总额', cx, cy + 12);
+
+  // Legend
+  legend.innerHTML = STORES.map((s, i) => {
+    const val = data[s.id]?.sales || 0;
+    const pct = totalSales > 0 ? Math.round(val / totalSales * 100) : 0;
+    return `<div class="share-legend-item">
+      <span class="share-legend-dot" style="background:${s.color}"></span>
+      <span class="share-legend-label">${s.name}</span>
+      <span class="share-legend-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderBarChart() {
+  const canvas = document.getElementById('barChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 350;
+  const H = canvas.offsetHeight || 220;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  const { data, totalSales } = getMonthData(chartMonth);
+  const colors = STORES.map(s => s.color);
+  const vals = STORES.map(s => data[s.id]?.sales || 0);
+  const maxVal = Math.max(...vals, 1);
+
+  // Clear
+  ctx.clearRect(0, 0, W, H);
+  const padL = 50, padR = 16, padT = 20, padB = 50;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const barW = chartW / 4 * 0.6;
+  const gap = chartW / 4;
+
+  // Y-axis grid
+  const gridLines = 4;
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= gridLines; i++) {
+    const y = padT + chartH - (i / gridLines) * chartH;
+    const val = Math.round(maxVal * i / gridLines);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + chartW, y);
+    ctx.stroke();
+    ctx.fillText(fmtMoney(val), padL - 4, y + 3);
+  }
+
+  // Bars
+  STORES.forEach((s, i) => {
+    const val = vals[i];
+    const barH = (val / maxVal) * chartH;
+    const x = padL + i * gap + (gap - barW) / 2;
+    const y = padT + chartH - barH;
+
+    // Bar
+    ctx.fillStyle = colors[i];
+    roundRect(ctx, x, y, barW, barH, 4);
+    ctx.fill();
+
+    // Value label
+    if (val > 0) {
+      ctx.fillStyle = '#1E293B';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(fmtMoney(val), x + barW / 2, y - 4);
+    }
+
+    // Store name
+    ctx.fillStyle = '#64748B';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.name, x + barW / 2, padT + chartH + 16);
+  });
+}
+
+function renderLineChart() {
+  const canvas = document.getElementById('lineChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 350;
+  const H = canvas.offsetHeight || 260;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  const [yStr, mStr] = chartMonth.split('-');
+  const year = parseInt(yStr), month = parseInt(mStr);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const todayStr = today();
+  const maxDayThisMonth = todayStr.startsWith(chartMonth) ? parseInt(todayStr.split('-')[2]) : daysInMonth;
+
+  const dailyTotals = [];
+  for (let d = 1; d <= maxDayThisMonth; d++) {
+    const dateStr = formatDate(new Date(year, month - 1, d));
+    let total = 0;
+    STORES.forEach(s => {
+      const r = getRecordForDateStore(dateStr, s.id);
+      if (r) total += r.sales || 0;
+    });
+    dailyTotals.push(total);
+  }
+  const maxVal = Math.max(...dailyTotals, 1);
+
+  const padL = 50, padR = 16, padT = 20, padB = 40;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  const gridLines = 4;
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = padT + chartH - (i / gridLines) * chartH;
+    const val = Math.round(maxVal * i / gridLines);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + chartW, y);
+    ctx.stroke();
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtMoney(val), padL - 4, y + 3);
+  }
+
+  // X labels
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(maxDayThisMonth / 7));
+  for (let d = 1; d <= maxDayThisMonth; d += step) {
+    const x = padL + ((d - 0.5) / maxDayThisMonth) * chartW;
+    ctx.fillText(`${d}日`, x, padT + chartH + 16);
+  }
+
+  // Area fill
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + chartH);
+  dailyTotals.forEach((val, i) => {
+    const x = padL + ((i + 0.5) / maxDayThisMonth) * chartW;
+    const y = padT + chartH - (val / maxVal) * chartH;
+    ctx.lineTo(x, y);
+  });
+  ctx.lineTo(padL + chartW, padT + chartH);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
+  grad.addColorStop(0, 'rgba(37,99,235,0.3)');
+  grad.addColorStop(1, 'rgba(37,99,235,0.02)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#2563EB';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  dailyTotals.forEach((val, i) => {
+    const x = padL + ((i + 0.5) / maxDayThisMonth) * chartW;
+    const y = padT + chartH - (val / maxVal) * chartH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  dailyTotals.forEach((val, i) => {
+    if (val > 0) {
+      const x = padL + ((i + 0.5) / maxDayThisMonth) * chartW;
+      const y = padT + chartH - (val / maxVal) * chartH;
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#2563EB';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  });
+
+  // Legend
+  const legendEl = document.getElementById('lineLegend');
+  legendEl.innerHTML = '<div class="legend-item"><span class="legend-dot" style="background:#2563EB;"></span>每日总销售额</div>';
+}
+
+function renderMonthTable() {
+  const { data, totalSales } = getMonthData(chartMonth);
+  const tbody = document.getElementById('monthTableBody');
+
+  let rows = STORES.map(s => {
+    const d = data[s.id] || {};
+    return `<tr>
+      <td><div class="store-cell"><span class="store-dot ${s.id}"></span>${s.name}</div></td>
+      <td class="num">${fmtMoneyRaw(d.sales||0)}</td>
+      <td class="num">${fmtMoneyRaw(d.memberSales||0)}</td>
+      <td class="num">${d.orders||0}</td>
+    </tr>`;
+  }).join('');
+
+  const totals = { sales: 0, memberSales: 0, orders: 0 };
+  STORES.forEach(s => {
+    const d = data[s.id] || {};
+    totals.sales += d.sales || 0;
+    totals.memberSales += d.memberSales || 0;
+    totals.orders += d.orders || 0;
+  });
+  rows += `<tr class="total-row">
+    <td>合计</td>
+    <td class="num">${fmtMoneyRaw(totals.sales)}</td>
+    <td class="num">${fmtMoneyRaw(totals.memberSales)}</td>
+    <td class="num">${totals.orders}</td>
+  </tr>`;
+  tbody.innerHTML = rows;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ===== EXPORT REPORT =====
+function updateExportMonthDisplay() {
+  document.getElementById('exportMonthDisplay').textContent = getMonthLabel(exportMonth);
+}
+
+function changeExportMonth(delta) {
+  const [y, m] = exportMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  exportMonth = getYearMonth(d);
+  updateExportMonthDisplay();
+  renderExportReport();
+}
+
+function goToExportCurrentMonth() {
+  exportMonth = currentYM();
+  updateExportMonthDisplay();
+  renderExportReport();
+}
+
+function renderExportReport() {
+  const paper = document.getElementById('reportPaper');
+  const { data, totalSales } = getMonthData(exportMonth);
+  const monthLabel = getMonthLabel(exportMonth);
+  const [yStr, mStr] = exportMonth.split('-');
+  const year = parseInt(yStr), month = parseInt(mStr);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const todayStr = today();
+  const maxDay = todayStr.startsWith(exportMonth) ? parseInt(todayStr.split('-')[2]) : daysInMonth;
+
+  const totals = { sales: 0, memberSales: 0, orders: 0 };
+  STORES.forEach(s => {
+    const d = data[s.id] || {};
+    totals.sales += d.sales || 0;
+    totals.memberSales += d.memberSales || 0;
+    totals.orders += d.orders || 0;
+  });
+
+  // Daily data
+  const dailyRows = [];
+  for (let d = 1; d <= maxDay; d++) {
+    const dateStr = formatDate(new Date(year, month - 1, d));
+    let daySales = 0, dayMember = 0, dayOrders = 0;
+    STORES.forEach(s => {
+      const r = getRecordForDateStore(dateStr, s.id);
+      if (r) {
+        daySales += r.sales || 0;
+        dayMember += r.memberSales || 0;
+        dayOrders += r.orderCount || 0;
+      }
+    });
+    if (daySales > 0 || dayOrders > 0) {
+      dailyRows.push({ date: dateStr, day: d, sales: daySales, member: dayMember, orders: dayOrders });
+    }
+  }
+
+  // Store table rows
+  const storeRows = STORES.map(s => {
+    const d = data[s.id] || {};
+    const pct = totalSales > 0 ? ((d.sales||0) / totalSales * 100).toFixed(1) : '0.0';
+    return `<tr>
+      <td style="color:${s.color};font-weight:700;">${s.emoji} ${s.name}</td>
+      <td>¥${(d.sales||0).toLocaleString()}</td>
+      <td>¥${(d.memberSales||0).toLocaleString()}</td>
+      <td>${d.orders||0}</td>
+      <td>${pct}%</td>
+    </tr>`;
+  }).join('');
+
+  // Daily rows
+  const dailyRowsHtml = dailyRows.map(r => `
+    <tr>
+      <td>${r.day}日</td>
+      <td>¥${r.sales.toLocaleString()}</td>
+      <td>¥${r.member.toLocaleString()}</td>
+      <td>${r.orders}</td>
+    </tr>
+  `).join('');
+
+  paper.innerHTML = `
+    <div class="report-header">
+      <h1>🏪 常州图文快印</h1>
+      <h2>门店月度销售报表</h2>
+      <div class="date-range">统计周期：${monthLabel} 1日 ~ ${maxDay}日</div>
+      <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">生成时间：${new Date().toLocaleString('zh-CN')}</div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-section-title">📊 月度汇总</div>
+      <table class="report-table">
+        <tr>
+          <th>指标</th><th>金额/数量</th><th>说明</th>
+        </tr>
+        <tr>
+          <td>月销售总额</td>
+          <td style="font-weight:700; color:#2563EB; font-size:12px;">¥${totals.sales.toLocaleString()}</td>
+          <td rowspan="2" style="font-size:9px; color:var(--text-secondary); vertical-align:middle;">
+            ${totals.sales > 0 ? ((totals.memberSales/totals.sales)*100).toFixed(1)+'% 为会员消费' : '暂无数据'}
+          </td>
+        </tr>
+        <tr>
+          <td>月会员消费</td>
+          <td style="font-weight:700;">¥${totals.memberSales.toLocaleString()}</td>
+        </tr>
+        <tr>
+          <td>月订单总数</td>
+          <td style="font-weight:700;">${totals.orders.toLocaleString()} 单</td>
+          <td style="font-size:9px; color:var(--text-secondary);">已填报 ${dailyRows.length} 天</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="report-section">
+      <div class="report-section-title">🏪 各门店月数据</div>
+      <table class="report-table">
+        <tr>
+          <th>门店</th><th>销售额</th><th>会员消费</th><th>订单</th><th>占比</th>
+        </tr>
+        ${storeRows}
+        <tr class="total-row">
+          <td>合计</td>
+          <td>¥${totals.sales.toLocaleString()}</td>
+          <td>¥${totals.memberSales.toLocaleString()}</td>
+          <td>${totals.orders}</td>
+          <td>100%</td>
+        </tr>
+      </table>
+    </div>
+
+    ${dailyRows.length > 0 ? `
+    <div class="report-section">
+      <div class="report-section-title">📅 每日明细（已填报日期）</div>
+      <table class="report-table">
+        <tr>
+          <th>日期</th><th>销售额</th><th>会员消费</th><th>订单数</th>
+        </tr>
+        ${dailyRowsHtml}
+      </table>
+    </div>` : ''}
+
+    <div style="text-align:center; margin-top:16px; padding-top:8px; border-top:1px solid var(--border); font-size:9px; color:#94A3B8;">
+      常州图文快印连锁 · 门店销售协作报表系统<br>
+      数据来源：移动端实时录入 · ${new Date().getFullYear()}
+    </div>
+  `;
+}
+
+// ===== EXPORT FUNCTIONS =====
+async function exportImage() {
+  showNotification('正在生成图片...');
+  try {
+    const paper = document.getElementById('reportPaper');
+    const { default: html2canvas } = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.min.js');
+    const canvas = await html2canvas(paper, { scale: 3, backgroundColor: '#ffffff', useCORS: true });
+    const link = document.createElement('a');
+    link.download = `常州图文报表_${exportMonth}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showNotification('✅ 图片已保存', 'success');
+  } catch (e) {
+    // Fallback: use canvas directly
+    try {
+      const paper = document.getElementById('reportPaper');
+      const canvas = document.createElement('canvas');
+      canvas.width = 2480; canvas.height = 3508;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#1E293B';
+      ctx.font = '24px sans-serif';
+      ctx.fillText(`${exportMonth} 月度报表 - 请使用PDF导出获取完整内容`, 100, 200);
+      const link = document.createElement('a');
+      link.download = `常州图文报表_${exportMonth}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showNotification('✅ 图片已保存', 'success');
+    } catch (err) {
+      showNotification('导出失败，请尝试PDF', 'error');
+    }
+  }
+}
+
+async function exportPDF() {
+  showNotification('正在生成PDF...');
+  try {
+    const { default: html2canvas } = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.min.js');
+    const { default: jspdf } = await import('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.es.min.js');
+    const paper = document.getElementById('reportPaper');
+    const canvas = await html2canvas(paper, { scale: 3, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    const imgW = canvas.width, imgH = canvas.height;
+    const ratio = pdfW / imgW * imgH;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, Math.min(ratio, pdfH));
+    pdf.save(`常州图文报表_${exportMonth}.pdf`);
+    showNotification('✅ PDF已下载', 'success');
+  } catch (e) {
+    showNotification('PDF导出需要网络连接', 'error');
+  }
+}
+
+// ===== SETTINGS =====
+function showSettings() {
+  document.getElementById('settingsModal').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function exportData() {
+  const data = { records: allRecords, exportTime: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.download = `常州图文数据备份_${formatDate(new Date())}.json`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  showNotification('✅ 数据已导出', 'success');
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (data.records) {
+      for (const rec of Object.values(data.records)) {
+        await saveRecord(rec);
+      }
+      await loadAllRecords();
+      refreshAdminView();
+      showNotification(`✅ 已导入 ${Object.keys(data.records).length} 条记录`, 'success');
+    }
+  } catch (e) {
+    showNotification('导入失败：文件格式错误', 'error');
+  }
+  event.target.value = '';
+}
+
+async function clearAllData() {
+  if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) return;
+  if (!confirm('再次确认：所有销售记录将被永久删除！')) return;
+  await clearAllRecords();
+  allRecords = {};
+  refreshAdminView();
+  closeSettings();
+  showNotification('🗑️ 数据已清空', 'error');
+}
+
+// ===== EMPLOYEE LINKS =====
+function updateEmployeeLinks() {
+  const container = document.getElementById('linksList');
+  const baseUrl = window.location.href.split('?')[0];
+  container.innerHTML = STORES.map(s => `
+    <div style="margin-bottom:8px;">
+      <div style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; margin-bottom:2px;">
+        <span class="store-dot ${s.id}"></span>${s.emoji} ${s.name}员工入口
+      </div>
+      <div class="link-box">${baseUrl}?store=${s.id}</div>
+      <button onclick="copyLink('${s.id}')" style="
+        margin-top:4px; font-size:11px; color:var(--primary); font-weight:600;
+        background:none; border:none; cursor:pointer; padding:0;
+      ">📋 复制链接</button>
+    </div>
+  `).join('');
+}
+
+function copyLink(storeId) {
+  const baseUrl = window.location.href.split('?')[0];
+  const link = `${baseUrl}?store=${storeId}`;
+  navigator.clipboard?.writeText(link).then(() => {
+    showNotification('✅ 链接已复制到剪贴板', 'success');
+  }).catch(() => {
+    prompt('复制此链接：', link);
+  });
+}
+
+// ===== PWA SERVICE WORKER =====
+async function registerSW() {
+  if ('serviceWorker' in navigator) {
+    try {
+      await navigator.serviceWorker.register('sw.js');
+    } catch (e) {
+      // SW registration may fail if file not served via HTTP
+    }
+  }
+}
+
+// ===== URL PARAM HANDLING =====
+function handleURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  const storeParam = params.get('store');
+  if (storeParam) {
+    const store = STORES.find(s => s.id === storeParam);
+    if (store) {
+      selectEmpStore(storeParam);
+      return;
+    }
+  }
+  // Check localStorage
+  const savedRole = localStorage.getItem('cz_role');
+  if (savedRole === 'admin') {
+    showAdminLogin();
+  } else if (savedRole === 'employee') {
+    const savedStore = localStorage.getItem('cz_store');
+    if (savedStore) {
+      const store = STORES.find(s => s.id === savedStore);
+      if (store) {
+        selectEmpStore(savedStore);
+        return;
+      }
+    }
+    showEmployeeLogin();
+  } else {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'flex';
+  }
+}
+
+// ===== INIT =====
+async function init() {
+  try {
+    await openDB();
+    await loadAllRecords();
+    loadSupabaseConfig(); // Load Supabase config
+    handleURLParams();
+    updateLoginPageDisplay(); // 根据员工模式限制更新登录页面
+
+    // Try to sync from cloud on startup
+    if (supabaseConfig.enabled) {
+      syncFromCloudDirect();
+    }
+  } catch (e) {
+    console.error('Init error:', e);
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'flex';
+  }
+
+  // Hide loading
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('hidden');
+  setTimeout(() => overlay.style.display = 'none', 500);
+
+  // Handle resize for charts
+  window.addEventListener('resize', () => {
+    if (document.getElementById('pageCharts')?.classList.contains('active')) {
+      renderCharts();
+    }
+  });
+}
+
+// Auto-save role preference
+const origSelectEmpStore = selectEmpStore;
+selectEmpStore = function(storeId) {
+  localStorage.setItem('cz_role', 'employee');
+  localStorage.setItem('cz_store', storeId);
+  origSelectEmpStore(storeId);
+};
+
+const origShowAdminLogin = showAdminLogin;
+showAdminLogin = function() {
+  localStorage.setItem('cz_role', 'admin');
+  origShowAdminLogin();
+};
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
