@@ -1380,7 +1380,6 @@ let chartMonth = getYearMonth(new Date());
 let exportMonth = getYearMonth(new Date());
 let currentRole = null; // 'admin' | 'employee'
 let currentEmpStore = null;
-let isEmployeeMode = false; // 门店员工模式限制 - 防止切换到管理员
 let allRecords = {};
 let isEditing = false;
 
@@ -1695,7 +1694,9 @@ function showNotification(msg, type = '') {
 // ===== LOGIN =====
 function showAdminLogin() {
   currentRole = 'admin';
+  localStorage.setItem('cz_isAdmin', 'true'); // 标记用户可以访问管理员
   document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('employeeInterface').style.display = 'none'; // 隐藏员工界面
   document.getElementById('adminInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   initAdmin();
@@ -1714,19 +1715,23 @@ function showEmployeeLogin() {
   document.getElementById('empStoreModal').classList.add('active');
 }
 
-// 更新登录页面显示 - 门店员工模式限制
+// 更新登录页面显示 - 真正的门店员工模式限制
 function updateLoginPageDisplay() {
   const adminBtn = document.getElementById('adminLoginBtn');
   const empBtn = document.getElementById('employeeLoginBtn');
   const qrHint = document.querySelector('.login-qr-hint');
 
-  if (isEmployeeMode) {
-    // 门店员工模式：隐藏管理员登录入口
+  // 只有真正的门店员工（未以管理员身份登录过）才限制
+  const isRealEmployee = localStorage.getItem('cz_isAdmin') !== 'true';
+  const isRestricted = isRealEmployee && localStorage.getItem('cz_role') === 'employee';
+
+  if (isRestricted) {
+    // 真正的门店员工模式：隐藏管理员登录入口
     adminBtn.style.display = 'none';
     empBtn.classList.add('primary');
     if (qrHint) qrHint.style.display = 'none';
   } else {
-    // 正常模式：显示所有入口
+    // 正常模式：显示所有入口（管理员或未登录用户）
     adminBtn.style.display = 'flex';
     empBtn.classList.remove('primary');
     if (qrHint) qrHint.style.display = 'block';
@@ -1736,9 +1741,9 @@ function updateLoginPageDisplay() {
 function selectEmpStore(storeId) {
   currentRole = 'employee';
   currentEmpStore = STORES.find(s => s.id === storeId);
-  isEmployeeMode = true; // 设置员工模式限制
   closeEmpStoreModal();
   document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('adminInterface').style.display = 'none'; // 隐藏管理员界面
   document.getElementById('employeeInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
@@ -1752,8 +1757,8 @@ function closeEmpStoreModal() {
 
 function logout() {
   currentRole = null;
-  isEmployeeMode = false; // 管理员退出后允许切换
   document.getElementById('adminInterface').style.display = 'none';
+  document.getElementById('employeeInterface').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
   updateLoginPageDisplay(); // 更新登录页面显示
 }
@@ -1761,9 +1766,17 @@ function logout() {
 function empLogout() {
   currentRole = null;
   currentEmpStore = null;
-  isEmployeeMode = true; // 保持员工模式限制，防止切换到管理员
   document.getElementById('employeeInterface').style.display = 'none';
-  showEmployeeLogin(); // 直接显示员工登录
+
+  // 如果是管理员临时查看门店，退出后回到管理员界面
+  if (localStorage.getItem('cz_isAdmin') === 'true') {
+    document.getElementById('adminInterface').style.display = 'flex';
+    initAdmin();
+  } else {
+    // 真正的门店员工，退出后只能重新登录员工
+    document.getElementById('loginPage').style.display = 'flex';
+    showEmployeeLogin();
+  }
 }
 
 // ===== ADMIN INIT =====
