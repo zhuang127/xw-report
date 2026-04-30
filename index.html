@@ -322,6 +322,13 @@ img { max-width: 100%; }
   gap: 10px;
 }
 .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+/* 手机响应式：3列变2列 */
+@media (max-width: 480px) {
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+  .form-group { min-width: 0; }
+  .form-input-wrap { min-width: 0; }
+  .form-input { min-width: 60px; font-size: 16px; }
+}
 .form-group {
   display: flex;
   flex-direction: column;
@@ -368,6 +375,7 @@ img { max-width: 100%; }
   color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
+  overflow: visible;
 }
 .form-input:focus {
   border-color: var(--primary);
