@@ -322,13 +322,6 @@ img { max-width: 100%; }
   gap: 10px;
 }
 .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-/* 手机响应式：3列变2列 */
-@media (max-width: 480px) {
-  .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
-  .form-group { min-width: 0; }
-  .form-input-wrap { min-width: 0; }
-  .form-input { min-width: 60px; font-size: 16px; }
-}
 .form-group {
   display: flex;
   flex-direction: column;
@@ -375,7 +368,6 @@ img { max-width: 100%; }
   color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
-  overflow: visible;
 }
 .form-input:focus {
   border-color: var(--primary);
@@ -1053,13 +1045,13 @@ canvas { display: block; width: 100% !important; }
     <div class="login-title">常州图文快印</div>
     <div class="login-subtitle">4门店日销售协作报表系统</div>
     <div class="login-card">
-      <button class="login-role-btn primary" id="adminLoginBtn" onclick="showAdminLogin()">
+      <button class="login-role-btn primary" onclick="showAdminLogin()">
         <span class="login-role-icon">🔑</span>
         <span class="login-role-text">
           管理员登录<br><span class="login-role-desc">查看所有门店数据、汇总报表、导出报表</span>
         </span>
       </button>
-      <button class="login-role-btn" id="employeeLoginBtn" onclick="showEmployeeLogin()">
+      <button class="login-role-btn" onclick="showEmployeeLogin()">
         <span class="login-role-icon">👤</span>
         <span class="login-role-text">
           门店员工入口<br><span class="login-role-desc">扫码进入专属填写页面</span>
@@ -1545,30 +1537,36 @@ async function syncFromCloudDirect() {
     
     const data = await res.json();
     if (Array.isArray(data)) {
-      let updated = 0;
       data.forEach(cloudRec => {
         const localRec = allRecords[cloudRec.id];
         const cloudTime = cloudRec.updated_at || 0;
-        const localTime = localRec?.updated_at || 0;
+        const localTime = localRec?.updatedAt || 0;
         
         if (!localRec || cloudTime > localTime) {
-          allRecords[cloudRec.id] = cloudRec;
+          // Convert cloud data (snake_case) to local format (camelCase)
+          const convertedRec = {
+            id: cloudRec.id,
+            date: cloudRec.date,
+            storeId: cloudRec.store_id,
+            sales: cloudRec.sales || 0,
+            memberSales: cloudRec.member_sales || 0,
+            orderCount: cloudRec.order_count || 0,
+            month: cloudRec.month,
+            updatedAt: cloudRec.updated_at || Date.now()
+          };
+          allRecords[convertedRec.id] = convertedRec;
           // Save to local IndexedDB
           if (db) {
             const tx = db.transaction(STORE_RECORDS, 'readwrite');
-            tx.objectStore(STORE_RECORDS).put(cloudRec);
+            tx.objectStore(STORE_RECORDS).put(convertedRec);
           }
-          updated++;
         }
       });
       
-      if (updated > 0) {
-        // CRITICAL FIX: Reload allRecords from IndexedDB after sync
-        // This ensures the in-memory data matches what's in the database
-        allRecords = await getAllRecords();
-        showNotification(`☁️ 已同步 ${updated} 条云端记录`, 'success');
+      if (data.length > 0) {
+        showNotification(`☁️ 已同步 ${data.length} 条云端记录`, 'success');
+        refreshAdminView();
       }
-      // Note: Don't call refreshAdminView() here - initAdmin/refreshAdminView will handle it
     }
   } catch (e) {
     console.log('Cloud sync error:', e.message);
@@ -1707,9 +1705,7 @@ function showNotification(msg, type = '') {
 // ===== LOGIN =====
 function showAdminLogin() {
   currentRole = 'admin';
-  localStorage.setItem('cz_isAdmin', 'true'); // 标记用户可以访问管理员
   document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('employeeInterface').style.display = 'none'; // 隐藏员工界面
   document.getElementById('adminInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   initAdmin();
@@ -1728,38 +1724,11 @@ function showEmployeeLogin() {
   document.getElementById('empStoreModal').classList.add('active');
 }
 
-// Update login page display - real store employee mode restriction
-function updateLoginPageDisplay() {
-  const adminBtn = document.getElementById('adminLoginBtn');
-  const empBtn = document.getElementById('employeeLoginBtn');
-  const qrHint = document.querySelector('.login-qr-hint');
-
-  // Only apply store employee mode restriction when:
-  // 1. User has logged in as employee before (cz_role = 'employee')
-  // 2. User is NOT currently logged in (cz_role is null or admin is already set)
-  const czRole = localStorage.getItem('cz_role');
-  const isEmployeeMode = czRole === 'employee';
-  const isAdminMode = czRole === 'admin';
-
-  if (isEmployeeMode) {
-    // Real store employee: hide admin button
-    adminBtn.style.display = 'none';
-    empBtn.classList.add('primary');
-    if (qrHint) qrHint.style.display = 'none';
-  } else {
-    // Normal mode or admin mode: show both buttons
-    adminBtn.style.display = 'flex';
-    empBtn.classList.remove('primary');
-    if (qrHint) qrHint.style.display = 'block';
-  }
-}
-
 function selectEmpStore(storeId) {
   currentRole = 'employee';
   currentEmpStore = STORES.find(s => s.id === storeId);
   closeEmpStoreModal();
   document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('adminInterface').style.display = 'none'; // 隐藏管理员界面
   document.getElementById('employeeInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
@@ -1773,46 +1742,21 @@ function closeEmpStoreModal() {
 
 function logout() {
   currentRole = null;
-  localStorage.removeItem('cz_role');    // 清除角色
-  localStorage.removeItem('cz_isAdmin'); // 清除管理员标记
   document.getElementById('adminInterface').style.display = 'none';
-  document.getElementById('employeeInterface').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
-  updateLoginPageDisplay(); // 更新登录页面显示
 }
 
 function empLogout() {
   currentRole = null;
   currentEmpStore = null;
-
-  // 清除员工登录状态（防止下次自动进入门店）
-  localStorage.removeItem('cz_role');
-  localStorage.removeItem('cz_store');
-
-  // 如果是管理员临时查看门店，退出后回到管理员界面
-  if (localStorage.getItem('cz_isAdmin') === 'true') {
-    document.getElementById('employeeInterface').style.display = 'none';
-    document.getElementById('adminInterface').style.display = 'flex';
-    document.getElementById('loginPage').style.display = 'none';
-    initAdmin();
-  } else {
-    // 真正的门店员工，退出后只能重新登录员工
-    document.getElementById('employeeInterface').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'flex';
-    showEmployeeLogin();
-  }
+  document.getElementById('employeeInterface').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
 }
 
 // ===== ADMIN INIT =====
 async function initAdmin() {
   updateDateDisplay();
   updateEmployeeLinks();
-  
-  // Sync from cloud first to get latest data from all stores/employees
-  if (supabaseConfig.enabled) {
-    await syncFromCloudDirect();
-  }
-  
   await refreshAdminView();
 }
 
@@ -1827,6 +1771,14 @@ async function refreshAdminView() {
 
 // ===== DATA LOAD =====
 async function loadAllRecords() {
+  // First load from local IndexedDB
+  allRecords = await getAllRecords();
+  // Then sync from cloud (merge cloud data into local)
+  await syncFromCloudDirect();
+}
+
+async function loadLocalOnly() {
+  // Load from local IndexedDB only (without cloud sync)
   allRecords = await getAllRecords();
 }
 
@@ -2911,20 +2863,16 @@ async function registerSW() {
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search);
   const storeParam = params.get('store');
-  
   if (storeParam) {
-    // URL has store parameter -> auto-enter employee mode for that store
     const store = STORES.find(s => s.id === storeParam);
     if (store) {
       selectEmpStore(storeParam);
       return;
     }
   }
-  
-  // Check localStorage for saved role preference
+  // Check localStorage
   const savedRole = localStorage.getItem('cz_role');
   if (savedRole === 'admin') {
-    // Auto-restore admin session (no need to click button again)
     showAdminLogin();
   } else if (savedRole === 'employee') {
     const savedStore = localStorage.getItem('cz_store');
@@ -2937,7 +2885,6 @@ function handleURLParams() {
     }
     showEmployeeLogin();
   } else {
-    // No saved role -> show login page
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('appContainer').style.display = 'flex';
   }
@@ -2950,8 +2897,7 @@ async function init() {
     await loadAllRecords();
     loadSupabaseConfig(); // Load Supabase config
     handleURLParams();
-    updateLoginPageDisplay(); // 根据员工模式限制更新登录页面
-
+    
     // Try to sync from cloud on startup
     if (supabaseConfig.enabled) {
       syncFromCloudDirect();
