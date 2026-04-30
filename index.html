@@ -984,6 +984,15 @@ canvas { display: block; width: 100% !important; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* ==================== RESPONSIVE (Mobile) ==================== */
+@media (max-width: 480px) {
+  .form-group { min-width: 0; }
+  .form-input-wrap { min-width: 0; }
+  .form-input { min-width: 60px; font-size: 16px; }
+  /* 确保输入框不溢出 */
+  .form-grid { min-width: 0; overflow: visible; }
+}
+
 /* ==================== PRINT ==================== */
 @media print {
   body { background: white; }
