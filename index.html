@@ -1766,14 +1766,20 @@ function logout() {
 function empLogout() {
   currentRole = null;
   currentEmpStore = null;
-  document.getElementById('employeeInterface').style.display = 'none';
+
+  // 清除员工登录状态（防止下次自动进入门店）
+  localStorage.removeItem('cz_role');
+  localStorage.removeItem('cz_store');
 
   // 如果是管理员临时查看门店，退出后回到管理员界面
   if (localStorage.getItem('cz_isAdmin') === 'true') {
+    document.getElementById('employeeInterface').style.display = 'none';
     document.getElementById('adminInterface').style.display = 'flex';
+    document.getElementById('loginPage').style.display = 'none';
     initAdmin();
   } else {
     // 真正的门店员工，退出后只能重新登录员工
+    document.getElementById('employeeInterface').style.display = 'none';
     document.getElementById('loginPage').style.display = 'flex';
     showEmployeeLogin();
   }
