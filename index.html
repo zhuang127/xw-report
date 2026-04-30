@@ -1537,6 +1537,7 @@ async function syncFromCloudDirect() {
     
     const data = await res.json();
     if (Array.isArray(data)) {
+      let updated = 0;
       data.forEach(cloudRec => {
         const localRec = allRecords[cloudRec.id];
         const cloudTime = cloudRec.updated_at || 0;
@@ -1549,13 +1550,17 @@ async function syncFromCloudDirect() {
             const tx = db.transaction(STORE_RECORDS, 'readwrite');
             tx.objectStore(STORE_RECORDS).put(cloudRec);
           }
+          updated++;
         }
       });
       
-      if (data.length > 0) {
-        showNotification(`☁️ 已同步 ${data.length} 条云端记录`, 'success');
-        refreshAdminView();
+      if (updated > 0) {
+        // CRITICAL FIX: Reload allRecords from IndexedDB after sync
+        // This ensures the in-memory data matches what's in the database
+        allRecords = await getAllRecords();
+        showNotification(`☁️ 已同步 ${updated} 条云端记录`, 'success');
       }
+      // Note: Don't call refreshAdminView() here - initAdmin/refreshAdminView will handle it
     }
   } catch (e) {
     console.log('Cloud sync error:', e.message);
@@ -1715,23 +1720,26 @@ function showEmployeeLogin() {
   document.getElementById('empStoreModal').classList.add('active');
 }
 
-// 更新登录页面显示 - 真正的门店员工模式限制
+// Update login page display - real store employee mode restriction
 function updateLoginPageDisplay() {
   const adminBtn = document.getElementById('adminLoginBtn');
   const empBtn = document.getElementById('employeeLoginBtn');
   const qrHint = document.querySelector('.login-qr-hint');
 
-  // 只有真正的门店员工（未以管理员身份登录过）才限制
-  const isRealEmployee = localStorage.getItem('cz_isAdmin') !== 'true';
-  const isRestricted = isRealEmployee && localStorage.getItem('cz_role') === 'employee';
+  // Only apply store employee mode restriction when:
+  // 1. User has logged in as employee before (cz_role = 'employee')
+  // 2. User is NOT currently logged in (cz_role is null or admin is already set)
+  const czRole = localStorage.getItem('cz_role');
+  const isEmployeeMode = czRole === 'employee';
+  const isAdminMode = czRole === 'admin';
 
-  if (isRestricted) {
-    // 真正的门店员工模式：隐藏管理员登录入口
+  if (isEmployeeMode) {
+    // Real store employee: hide admin button
     adminBtn.style.display = 'none';
     empBtn.classList.add('primary');
     if (qrHint) qrHint.style.display = 'none';
   } else {
-    // 正常模式：显示所有入口（管理员或未登录用户）
+    // Normal mode or admin mode: show both buttons
     adminBtn.style.display = 'flex';
     empBtn.classList.remove('primary');
     if (qrHint) qrHint.style.display = 'block';
@@ -1757,6 +1765,8 @@ function closeEmpStoreModal() {
 
 function logout() {
   currentRole = null;
+  localStorage.removeItem('cz_role');    // 清除角色
+  localStorage.removeItem('cz_isAdmin'); // 清除管理员标记
   document.getElementById('adminInterface').style.display = 'none';
   document.getElementById('employeeInterface').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
@@ -1789,6 +1799,12 @@ function empLogout() {
 async function initAdmin() {
   updateDateDisplay();
   updateEmployeeLinks();
+  
+  // Sync from cloud first to get latest data from all stores/employees
+  if (supabaseConfig.enabled) {
+    await syncFromCloudDirect();
+  }
+  
   await refreshAdminView();
 }
 
@@ -2887,16 +2903,20 @@ async function registerSW() {
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search);
   const storeParam = params.get('store');
+  
   if (storeParam) {
+    // URL has store parameter -> auto-enter employee mode for that store
     const store = STORES.find(s => s.id === storeParam);
     if (store) {
       selectEmpStore(storeParam);
       return;
     }
   }
-  // Check localStorage
+  
+  // Check localStorage for saved role preference
   const savedRole = localStorage.getItem('cz_role');
   if (savedRole === 'admin') {
+    // Auto-restore admin session (no need to click button again)
     showAdminLogin();
   } else if (savedRole === 'employee') {
     const savedStore = localStorage.getItem('cz_store');
@@ -2909,6 +2929,7 @@ function handleURLParams() {
     }
     showEmployeeLogin();
   } else {
+    // No saved role -> show login page
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('appContainer').style.display = 'flex';
   }
