@@ -1041,6 +1041,7 @@ canvas { display: block; width: 100% !important; }
 /* ==================== HIDDEN ==================== */
 .hidden { display: none !important; }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -2841,23 +2842,62 @@ async function clearAllData() {
 function updateEmployeeLinks() {
   const container = document.getElementById('linksList');
   const baseUrl = window.location.href.split('?')[0];
-  container.innerHTML = STORES.map(s => `
-    <div style="margin-bottom:8px;">
-      <div style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; margin-bottom:2px;">
+  const hasSupabase = supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.key;
+  
+  container.innerHTML = STORES.map(s => {
+    // Build URL with Supabase config if available
+    let url = `${baseUrl}?store=${s.id}`;
+    if (hasSupabase) {
+      url += `&sb_url=${encodeURIComponent(supabaseConfig.url)}&sb_key=${encodeURIComponent(supabaseConfig.key)}`;
+    }
+    
+    return `
+    <div style="margin-bottom:16px; padding:12px; background:var(--bg); border-radius:var(--radius-sm);">
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; margin-bottom:8px;">
         <span class="store-dot ${s.id}"></span>${s.emoji} ${s.name}员工入口
       </div>
-      <div class="link-box">${baseUrl}?store=${s.id}</div>
-      <button onclick="copyLink('${s.id}')" style="
-        margin-top:4px; font-size:11px; color:var(--primary); font-weight:600;
-        background:none; border:none; cursor:pointer; padding:0;
-      ">📋 复制链接</button>
+      <div class="link-box" style="font-size:11px;">${url}</div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button onclick="copyLink('${s.id}')" style="
+          font-size:11px; color:var(--primary); font-weight:600;
+          background:none; border:none; cursor:pointer; padding:4px 8px;
+        ">📋 复制链接</button>
+        <button onclick="showQRCode('${s.id}', '${url.replace(/'/g, "\\'")}')" style="
+          font-size:11px; color:var(--primary); font-weight:600;
+          background:none; border:1px solid var(--primary); cursor:pointer; padding:4px 8px;
+          border-radius:6px;
+        ">📱 生成二维码</button>
+      </div>
+      <div id="qrcode_${s.id}" style="margin-top:8px; display:none;"></div>
     </div>
-  `).join('');
+    `;
+  }).join('');
+}
+
+function showQRCode(storeId, url) {
+  const container = document.getElementById(`qrcode_${storeId}`);
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+    container.innerHTML = '';
+    new QRCode(container, {
+      text: url,
+      width: 128,
+      height: 128,
+      colorDark: '#1E293B',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } else {
+    container.style.display = 'none';
+  }
 }
 
 function copyLink(storeId) {
   const baseUrl = window.location.href.split('?')[0];
-  const link = `${baseUrl}?store=${storeId}`;
+  let link = `${baseUrl}?store=${storeId}`;
+  if (supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.key) {
+    link += `&sb_url=${encodeURIComponent(supabaseConfig.url)}&sb_key=${encodeURIComponent(supabaseConfig.key)}`;
+  }
   navigator.clipboard?.writeText(link).then(() => {
     showNotification('✅ 链接已复制到剪贴板', 'success');
   }).catch(() => {
@@ -2879,6 +2919,18 @@ async function registerSW() {
 // ===== URL PARAM HANDLING =====
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search);
+  
+  // Check for Supabase config in URL (from admin-generated links)
+  const sbUrl = params.get('sb_url');
+  const sbKey = params.get('sb_key');
+  if (sbUrl && sbKey) {
+    supabaseConfig.url = decodeURIComponent(sbUrl);
+    supabaseConfig.key = decodeURIComponent(sbKey);
+    supabaseConfig.enabled = true;
+    localStorage.setItem('supabase_config', JSON.stringify(supabaseConfig));
+    updateSupabaseStatus();
+  }
+  
   const storeParam = params.get('store');
   if (storeParam) {
     const store = STORES.find(s => s.id === storeParam);
