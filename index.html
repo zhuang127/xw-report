@@ -991,6 +991,14 @@ canvas { display: block; width: 100% !important; }
   .form-input { min-width: 60px; font-size: 16px; }
   /* 确保输入框不溢出 */
   .form-grid { min-width: 0; overflow: visible; }
+  /* 3列布局在手机端改成2+1布局，让输入框更宽 */
+  .form-grid.cols-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .form-grid.cols-3 .form-group:last-child {
+    grid-column: 1 / -1;
+    max-width: 50%;
+  }
 }
 
 /* ==================== PRINT ==================== */

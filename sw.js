@@ -1,5 +1,5 @@
 // Service Worker for 常州图文快印门店报表
-const CACHE_NAME = 'cz-print-report-v2';
+const CACHE_NAME = 'cz-print-report-v3';
 const ASSETS = [
   './',
   './index.html',
