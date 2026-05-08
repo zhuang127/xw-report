@@ -1747,7 +1747,6 @@ function selectEmpStore(storeId) {
   currentEmpStore = STORES.find(s => s.id === storeId);
   closeEmpStoreModal();
   document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('adminInterface').style.display = 'none';
   document.getElementById('employeeInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
@@ -1774,6 +1773,8 @@ function empLogout() {
 
 // ===== ADMIN INIT =====
 async function initAdmin() {
+  // 首先加载 Supabase 配置
+  loadSupabaseConfig();
   updateDateDisplay();
   updateEmployeeLinks();
   await refreshAdminView();
@@ -2964,11 +2965,11 @@ function handleURLParams() {
 async function init() {
   try {
     await openDB();
-    loadSupabaseConfig(); // Load Supabase config FIRST (needed for cloud sync)
     await loadAllRecords();
+    loadSupabaseConfig(); // Load Supabase config
     handleURLParams();
     
-    // Try to sync from cloud on startup (now config is already loaded)
+    // Try to sync from cloud on startup
     if (supabaseConfig.enabled) {
       syncFromCloudDirect();
     }
