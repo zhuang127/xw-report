@@ -1747,6 +1747,7 @@ function selectEmpStore(storeId) {
   currentEmpStore = STORES.find(s => s.id === storeId);
   closeEmpStoreModal();
   document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('adminInterface').style.display = 'none';
   document.getElementById('employeeInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
@@ -2963,11 +2964,11 @@ function handleURLParams() {
 async function init() {
   try {
     await openDB();
+    loadSupabaseConfig(); // Load Supabase config FIRST (needed for cloud sync)
     await loadAllRecords();
-    loadSupabaseConfig(); // Load Supabase config
     handleURLParams();
     
-    // Try to sync from cloud on startup
+    // Try to sync from cloud on startup (now config is already loaded)
     if (supabaseConfig.enabled) {
       syncFromCloudDirect();
     }
