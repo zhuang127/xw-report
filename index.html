@@ -1635,7 +1635,9 @@ async function saveToCloud(record) {
     });
     
     if (res.ok) {
-      showNotification(`☁️ 已同步到云端: ${record.date} ${getStoreName(record.storeId)}`, 'success');
+      const storeObj = STORES.find(s => s.id === record.storeId);
+      const storeName = storeObj ? storeObj.name : record.storeId;
+      showNotification(`☁️ 已同步到云端: ${record.date} ${storeName}`, 'success');
     } else {
       const errorText = await res.text();
       console.error('Cloud save failed:', res.status, errorText);
@@ -2937,11 +2939,37 @@ function copyLink(storeId) {
   if (supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.key) {
     link += `&sb_url=${encodeURIComponent(supabaseConfig.url)}&sb_key=${encodeURIComponent(supabaseConfig.key)}`;
   }
-  navigator.clipboard?.writeText(link).then(() => {
+  
+  // Try modern method first
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(link).then(() => {
+      showNotification('✅ 链接已复制到剪贴板', 'success');
+    }).catch(() => {
+      fallbackCopy(link);
+    });
+  } else {
+    fallbackCopy(link);
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  
+  try {
+    document.execCommand('copy');
     showNotification('✅ 链接已复制到剪贴板', 'success');
-  }).catch(() => {
-    prompt('复制此链接：', link);
-  });
+  } catch (e) {
+    // Last resort: show prompt
+    prompt('请手动复制此链接：', text);
+  }
+  
+  document.body.removeChild(textarea);
 }
 
 // ===== PWA SERVICE WORKER =====
