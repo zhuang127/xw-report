@@ -1388,7 +1388,7 @@ const STORES = [
   { id: 'downtown', name: '市区店', emoji: '🏙️', color: '#2563EB', hasMember: true },
   { id: 'newzone', name: '新区店', emoji: '🏢', color: '#10B981', hasMember: true },
   { id: 'hutang', name: '湖塘店', emoji: '🏡', color: '#F59E0B', hasMember: true },
-  { id: 'factory', name: '工厂店', emoji: '🏭', color: '#8B5CF6', hasMember: false },
+  { id: 'factory', name: '工厂店', emoji: '🏭', color: '#8B5CF6', hasMember: true },
 ];
 
 // ===== STATE =====
@@ -1540,7 +1540,10 @@ async function connectSupabase() {
 
 // Direct cloud sync functions (no supabase client needed)
 async function syncFromCloudDirect() {
-  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) return;
+  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) {
+    showNotification('⚠️ Supabase 未配置，无法同步云端数据', 'warning');
+    return;
+  }
   
   try {
     const res = await fetch(`${supabaseConfig.url}/rest/v1/daily_records`, {
@@ -1551,10 +1554,16 @@ async function syncFromCloudDirect() {
       }
     });
     
-    if (!res.ok) return;
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Cloud sync failed:', res.status, errorText);
+      showNotification(`⚠️ 云端同步失败 (${res.status})，请检查配置`, 'warning');
+      return;
+    }
     
     const data = await res.json();
     if (Array.isArray(data)) {
+      let newCount = 0;
       data.forEach(cloudRec => {
         const localRec = allRecords[cloudRec.id];
         const cloudTime = cloudRec.updated_at || 0;
@@ -1578,21 +1587,28 @@ async function syncFromCloudDirect() {
             const tx = db.transaction(STORE_RECORDS, 'readwrite');
             tx.objectStore(STORE_RECORDS).put(convertedRec);
           }
+          newCount++;
         }
       });
       
-      if (data.length > 0) {
-        showNotification(`☁️ 已同步 ${data.length} 条云端记录`, 'success');
+      if (newCount > 0) {
+        showNotification(`☁️ 已同步 ${newCount} 条新记录`, 'success');
         refreshAdminView();
+      } else {
+        showNotification('☁️ 云端数据已是最新', 'success');
       }
     }
   } catch (e) {
-    console.log('Cloud sync error:', e.message);
+    console.error('Cloud sync error:', e.message);
+    showNotification(`⚠️ 云端同步错误: ${e.message}`, 'warning');
   }
 }
 
 async function saveToCloud(record) {
-  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) return;
+  if (!supabaseConfig.enabled || !supabaseConfig.url || !supabaseConfig.key) {
+    showNotification('⚠️ Supabase 未配置，数据仅保存在本地', 'warning');
+    return;
+  }
   
   try {
     const cloudRec = {
@@ -1606,7 +1622,7 @@ async function saveToCloud(record) {
       updated_at: record.updatedAt || Date.now()
     };
     
-    await fetch(`${supabaseConfig.url}/rest/v1/daily_records`, {
+    const res = await fetch(`${supabaseConfig.url}/rest/v1/daily_records`, {
       method: 'POST',
       headers: {
         'apikey': supabaseConfig.key,
@@ -1616,8 +1632,17 @@ async function saveToCloud(record) {
       },
       body: JSON.stringify(cloudRec)
     });
+    
+    if (res.ok) {
+      showNotification(`☁️ 已同步到云端: ${record.date} ${getStoreName(record.storeId)}`, 'success');
+    } else {
+      const errorText = await res.text();
+      console.error('Cloud save failed:', res.status, errorText);
+      showNotification(`⚠️ 云端同步失败 (${res.status})，数据已保存在本地`, 'warning');
+    }
   } catch (e) {
-    console.log('Cloud save error:', e.message);
+    console.error('Cloud save error:', e.message);
+    showNotification(`⚠️ 云端同步错误: ${e.message}，数据已保存在本地`, 'warning');
   }
 }
 
