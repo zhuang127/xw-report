@@ -1,6 +1,6 @@
 // Service Worker for 常州图文快印门店报表
 // 版本号：每次修改代码后递增此版本号
-const CACHE_NAME = 'cz-print-report-v6';
+const CACHE_NAME = 'cz-print-report-v7';
 const ASSETS = [
   './',
   './index.html',

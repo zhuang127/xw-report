@@ -19,6 +19,7 @@
   --accent: #F59E0B;
   --success: #10B981;
   --danger: #EF4444;
+  --warning: #F59E0B;
   --bg: #F1F5F9;
   --card: #FFFFFF;
   --text: #1E293B;
@@ -1290,6 +1291,7 @@ canvas { display: block; width: 100% !important; }
       <div id="empEntryForm"></div>
       <div id="empModCount" style="margin-top:12px; padding:10px 14px; background:var(--bg); border-radius:var(--radius-sm); font-size:13px; color:var(--text-secondary); display:none;">
         📝 本月修改历史数据次数：<strong id="empModCountNum" style="color:var(--warning);">0</strong> 次
+        <div id="empModDates" style="margin-top:6px;"></div>
       </div>
     </main>
   </div>
@@ -1302,6 +1304,7 @@ canvas { display: block; width: 100% !important; }
       当前为门店专属界面<br>无法访问管理员功能
     </div>
     <button class="export-btn primary" style="margin-top:16px; min-width:160px;" onclick="empReenterStore()">🔄 重新进入本店</button>
+    <button class="export-btn secondary" style="margin-top:8px; min-width:160px;" onclick="empReturnToAdmin()">🔑 返回管理后台</button>
   </div>
   
 </div>
@@ -1834,6 +1837,11 @@ function empReenterStore() {
   initEmployee();
 }
 
+function empReturnToAdmin() {
+  document.getElementById('empStoreOnlyPage').style.display = 'none';
+  showAdminLogin();
+}
+
 // ===== ADMIN INIT =====
 async function initAdmin() {
   // 首先加载 Supabase 配置
@@ -2109,7 +2117,13 @@ function initEmployee() {
   const modCount = parseInt(localStorage.getItem(modKey) || '0');
   document.getElementById('empModCount').style.display = 'block';
   document.getElementById('empModCountNum').textContent = modCount;
-
+  
+  // 加载本月修改日期
+  const datesKey = `emp_mod_dates_${currentEmpStore.id}_${ym}`;
+  const modDates = JSON.parse(localStorage.getItem(datesKey) || '[]');
+  let datesHtml = modDates.map(d => `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">├─ ${d}</div>`).join('');
+  document.getElementById('empModDates').innerHTML = datesHtml;
+  
   updateEmpDateDisplay();
   updateEmpEntryForm();
 }
@@ -2211,6 +2225,18 @@ async function empSave() {
     modCount++;
     localStorage.setItem(modKey, modCount);
     document.getElementById('empModCountNum').textContent = modCount;
+    
+    // 记录修改日期
+    const datesKey = `emp_mod_dates_${currentEmpStore.id}_${ym}`;
+    let modDates = JSON.parse(localStorage.getItem(datesKey) || '[]');
+    if (!modDates.includes(currentDate)) {
+      modDates.push(currentDate);
+      localStorage.setItem(datesKey, JSON.stringify(modDates));
+    }
+    
+    // 更新日期显示
+    let datesHtml = modDates.map(d => `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">├─ ${d}</div>`).join('');
+    document.getElementById('empModDates').innerHTML = datesHtml;
   }
   
   allRecords[record.id] = record;
