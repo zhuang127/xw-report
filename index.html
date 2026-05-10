@@ -1786,6 +1786,11 @@ function showAdminLogin() {
 }
 
 function showEmployeeLogin() {
+  // ✅ 新增：检查当前是否是管理员，如果是则设置标志
+  if (localStorage.getItem('cz_role') === 'admin') {
+    sessionStorage.setItem('emp_from_admin', 'true');
+  }
+  
   // Show store picker
   const picker = document.getElementById('empStorePicker');
   picker.innerHTML = STORES.map(s => `
@@ -2132,7 +2137,10 @@ function initEmployee() {
   // 加载本月修改日期
   const datesKey = `emp_mod_dates_${currentEmpStore.id}_${ym}`;
   const modDates = JSON.parse(localStorage.getItem(datesKey) || '[]');
-  let datesHtml = modDates.map(d => `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">├─ ${d}</div>`).join('');
+  let datesHtml = modDates.map((d, i) => {
+    const prefix = i === modDates.length - 1 ? '└─' : '├─';
+    return `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">${prefix} ${d}</div>`;
+  }).join('');
   document.getElementById('empModDates').innerHTML = datesHtml;
   
   updateEmpDateDisplay();
@@ -2246,7 +2254,10 @@ async function empSave() {
     }
     
     // 更新日期显示
-    let datesHtml = modDates.map(d => `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">├─ ${d}</div>`).join('');
+    let datesHtml = modDates.map((d, i) => {
+    const prefix = i === modDates.length - 1 ? '└─' : '├─';
+    return `<div style="font-size:11px; color:var(--text-secondary); padding:2px 0;">${prefix} ${d}</div>`;
+  }).join('');
     document.getElementById('empModDates').innerHTML = datesHtml;
   }
   
@@ -2966,7 +2977,7 @@ function updateEmployeeLinks() {
   
   container.innerHTML = STORES.map(s => {
     // Build URL with Supabase config if available
-    let url = `${baseUrl}?store=${s.id}&from=admin`;
+    let url = `${baseUrl}?store=${s.id}`;
     if (hasSupabase) {
       url += `&sb_url=${encodeURIComponent(supabaseConfig.url)}&sb_key=${encodeURIComponent(supabaseConfig.key)}`;
     }
@@ -3071,11 +3082,6 @@ async function registerSW() {
 // ===== URL PARAM HANDLING =====
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search);
-  
-  // Check for from=admin parameter
-  if (params.get('from') === 'admin') {
-    sessionStorage.setItem('emp_from_admin', 'true');
-  }
   
   // Check for Supabase config in URL (from admin-generated links)
   const sbUrl = params.get('sb_url');
