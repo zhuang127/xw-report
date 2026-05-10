@@ -1811,6 +1811,7 @@ function selectEmpStore(storeId) {
     btn.style.color = currentEmpStore.color;
     btn.style.borderColor = currentEmpStore.color;
   });
+  
   initEmployee();
   registerSW();
 }
@@ -1829,6 +1830,16 @@ function empLogout() {
   document.getElementById('employeeInterface').style.display = 'none';
   document.getElementById('empStoreOnlyName').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name} - 员工入口`;
   document.getElementById('empStoreOnlyPage').style.display = 'flex';
+  
+  // 检查是否从管理员界面进入
+  const fromAdmin = sessionStorage.getItem('emp_from_admin') === 'true';
+  const returnBtn = document.querySelector('#empStoreOnlyPage .export-btn.secondary');
+  if (returnBtn) {
+    returnBtn.style.display = fromAdmin ? 'block' : 'none';
+  }
+  
+  // 清除标志（防止普通员工看到返回按钮）
+  sessionStorage.removeItem('emp_from_admin');
 }
 
 function empReenterStore() {
@@ -2955,7 +2966,7 @@ function updateEmployeeLinks() {
   
   container.innerHTML = STORES.map(s => {
     // Build URL with Supabase config if available
-    let url = `${baseUrl}?store=${s.id}`;
+    let url = `${baseUrl}?store=${s.id}&from=admin`;
     if (hasSupabase) {
       url += `&sb_url=${encodeURIComponent(supabaseConfig.url)}&sb_key=${encodeURIComponent(supabaseConfig.key)}`;
     }
@@ -3060,6 +3071,11 @@ async function registerSW() {
 // ===== URL PARAM HANDLING =====
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search);
+  
+  // Check for from=admin parameter
+  if (params.get('from') === 'admin') {
+    sessionStorage.setItem('emp_from_admin', 'true');
+  }
   
   // Check for Supabase config in URL (from admin-generated links)
   const sbUrl = params.get('sb_url');
