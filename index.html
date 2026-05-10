@@ -1288,9 +1288,22 @@ canvas { display: block; width: 100% !important; }
         </div>
       </div>
       <div id="empEntryForm"></div>
+      <div id="empModCount" style="margin-top:12px; padding:10px 14px; background:var(--bg); border-radius:var(--radius-sm); font-size:13px; color:var(--text-secondary); display:none;">
+        📝 本月修改历史数据次数：<strong id="empModCountNum" style="color:var(--warning);">0</strong> 次
+      </div>
     </main>
   </div>
 
+  <!-- ===== EMPLOYEE STORE-ONLY PAGE (after logout) ===== -->
+  <div id="empStoreOnlyPage" style="display:none; flex-direction:column; align-items:center; justify-content:center; flex:1; gap:24px; padding:40px;">
+    <div style="font-size:48px;">🏪</div>
+    <div style="font-size:18px; font-weight:700; color:var(--text);" id="empStoreOnlyName"></div>
+    <div style="font-size:13px; color:var(--text-secondary); text-align:center; line-height:1.6;">
+      当前为门店专属界面<br>无法访问管理员功能
+    </div>
+    <button class="export-btn primary" style="margin-top:16px; min-width:160px;" onclick="empReenterStore()">🔄 重新进入本店</button>
+  </div>
+  
 </div>
 
 <!-- Date Picker Modal -->
@@ -1789,6 +1802,12 @@ function selectEmpStore(storeId) {
   document.getElementById('employeeInterface').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'flex';
   document.getElementById('empStoreTitle').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name}`;
+  // 日期导航颜色随门店变化
+  document.getElementById('empDateDisplay').style.color = currentEmpStore.color;
+  document.querySelectorAll('#empDateNav .date-nav-btn').forEach(btn => {
+    btn.style.color = currentEmpStore.color;
+    btn.style.borderColor = currentEmpStore.color;
+  });
   initEmployee();
   registerSW();
 }
@@ -1804,10 +1823,15 @@ function logout() {
 }
 
 function empLogout() {
-  currentRole = null;
-  currentEmpStore = null;
   document.getElementById('employeeInterface').style.display = 'none';
-  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('empStoreOnlyName').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name} - 员工入口`;
+  document.getElementById('empStoreOnlyPage').style.display = 'flex';
+}
+
+function empReenterStore() {
+  document.getElementById('empStoreOnlyPage').style.display = 'none';
+  document.getElementById('employeeInterface').style.display = 'flex';
+  initEmployee();
 }
 
 // ===== ADMIN INIT =====
@@ -2079,6 +2103,13 @@ async function saveAllRecords() {
 
 // ===== EMPLOYEE INTERFACE =====
 function initEmployee() {
+  // 加载本月修改次数
+  const ym = currentDate.substring(0, 7);
+  const modKey = `emp_mod_count_${currentEmpStore.id}_${ym}`;
+  const modCount = parseInt(localStorage.getItem(modKey) || '0');
+  document.getElementById('empModCount').style.display = 'block';
+  document.getElementById('empModCountNum').textContent = modCount;
+
   updateEmpDateDisplay();
   updateEmpEntryForm();
 }
@@ -2171,6 +2202,17 @@ async function empSave() {
     updatedAt: Date.now()
   };
   await saveRecord(record);
+  
+  // 本月修改次数计数（仅历史数据，当天不计入）
+  if (currentDate !== today()) {
+    const ym = currentDate.substring(0, 7);
+    const modKey = `emp_mod_count_${currentEmpStore.id}_${ym}`;
+    let modCount = parseInt(localStorage.getItem(modKey) || '0');
+    modCount++;
+    localStorage.setItem(modKey, modCount);
+    document.getElementById('empModCountNum').textContent = modCount;
+  }
+  
   allRecords[record.id] = record;
 
   const btn = document.getElementById('empSaveBtn');
@@ -2899,10 +2941,6 @@ function updateEmployeeLinks() {
       </div>
       <div class="link-box" style="font-size:11px;">${url}</div>
       <div style="display:flex; gap:8px; margin-top:8px;">
-        <button onclick="copyLink('${s.id}')" style="
-          font-size:11px; color:var(--primary); font-weight:600;
-          background:none; border:none; cursor:pointer; padding:4px 8px;
-        ">📋 复制链接</button>
         <button onclick="showQRCode('${s.id}', '${url.replace(/'/g, "\\'")}')" style="
           font-size:11px; color:var(--primary); font-weight:600;
           background:none; border:1px solid var(--primary); cursor:pointer; padding:4px 8px;
