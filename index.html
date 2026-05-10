@@ -1786,8 +1786,8 @@ function showAdminLogin() {
 }
 
 function showEmployeeLogin() {
-  // ✅ 新增：检查当前是否是管理员，如果是则设置标志
-  if (localStorage.getItem('cz_role') === 'admin') {
+  // ✅ 修复：改用 currentRole 变量判断（localStorage 在手机浏览器可能不可靠）
+  if (currentRole === 'admin') {
     sessionStorage.setItem('emp_from_admin', 'true');
   }
   
