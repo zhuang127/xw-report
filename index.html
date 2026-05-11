@@ -1786,11 +1786,7 @@ function showAdminLogin() {
 }
 
 function showEmployeeLogin() {
-  // ✅ v12修复：改用 localStorage 替代 sessionStorage，页面刷新/重启后标记不丢失
-  if (currentRole === 'admin') {
-    localStorage.setItem('emp_from_admin', 'true');
-  }
-  
+  // 门店选择界面（emp_from_admin 在 selectEmpStore 包装函数中统一设置）
   // Show store picker
   const picker = document.getElementById('empStorePicker');
   picker.innerHTML = STORES.map(s => `
@@ -1803,7 +1799,10 @@ function showEmployeeLogin() {
 }
 
 function selectEmpStore(storeId) {
-  currentRole = 'employee';
+  // v12修复：管理员进入员工模式时，保留 admin 角色，不清为 employee
+  if (!localStorage.getItem('emp_from_admin')) {
+    currentRole = 'employee';
+  }
   currentEmpStore = STORES.find(s => s.id === storeId);
   closeEmpStoreModal();
   document.getElementById('loginPage').style.display = 'none';
@@ -1840,15 +1839,13 @@ function empLogout() {
   document.getElementById('empStoreOnlyName').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name} - 员工入口`;
   document.getElementById('empStoreOnlyPage').style.display = 'flex';
   
-  // v12修复：改用 localStorage，与 showEmployeeLogin() 保持一致
+  // v12修复：改用 localStorage，与 selectEmpStore 包装函数保持一致
   const fromAdmin = localStorage.getItem('emp_from_admin') === 'true';
   const returnBtn = document.querySelector('#empStoreOnlyPage .export-btn.secondary');
   if (returnBtn) {
     returnBtn.style.display = fromAdmin ? 'block' : 'none';
   }
-  
-  // 管理员点击"返回管理后台"后，清除标志；普通员工退出时也清除
-  localStorage.removeItem('emp_from_admin');
+  // 注意：不清空 emp_from_admin，等用户点"返回管理后台"时再清
 }
 
 function empReenterStore() {
@@ -3161,7 +3158,15 @@ async function init() {
 // Auto-save role preference
 const origSelectEmpStore = selectEmpStore;
 selectEmpStore = function(storeId) {
-  localStorage.setItem('cz_role', 'employee');
+  // v12修复：用 localStorage 判断是否为管理员（currentRole 刷新后丢失）
+  const isAdmin = localStorage.getItem('cz_role') === 'admin';
+  if (isAdmin) {
+    localStorage.setItem('emp_from_admin', 'true');
+  }
+  // 普通员工才写入 employee 角色；管理员保留 cz_role = admin
+  if (!isAdmin) {
+    localStorage.setItem('cz_role', 'employee');
+  }
   localStorage.setItem('cz_store', storeId);
   origSelectEmpStore(storeId);
 };
