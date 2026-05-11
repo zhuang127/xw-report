@@ -1786,9 +1786,9 @@ function showAdminLogin() {
 }
 
 function showEmployeeLogin() {
-  // ✅ 修复：改用 currentRole 变量判断（localStorage 在手机浏览器可能不可靠）
+  // ✅ v12修复：改用 localStorage 替代 sessionStorage，页面刷新/重启后标记不丢失
   if (currentRole === 'admin') {
-    sessionStorage.setItem('emp_from_admin', 'true');
+    localStorage.setItem('emp_from_admin', 'true');
   }
   
   // Show store picker
@@ -1827,6 +1827,10 @@ function closeEmpStoreModal() {
 
 function logout() {
   currentRole = null;
+  // v12修复：管理员退出时清除角色标记，防止刷新后被错误识别为员工
+  localStorage.removeItem('cz_role');
+  localStorage.removeItem('cz_store');
+  localStorage.removeItem('emp_from_admin');
   document.getElementById('adminInterface').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
 }
@@ -1836,15 +1840,15 @@ function empLogout() {
   document.getElementById('empStoreOnlyName').textContent = `${currentEmpStore.emoji} ${currentEmpStore.name} - 员工入口`;
   document.getElementById('empStoreOnlyPage').style.display = 'flex';
   
-  // 检查是否从管理员界面进入
-  const fromAdmin = sessionStorage.getItem('emp_from_admin') === 'true';
+  // v12修复：改用 localStorage，与 showEmployeeLogin() 保持一致
+  const fromAdmin = localStorage.getItem('emp_from_admin') === 'true';
   const returnBtn = document.querySelector('#empStoreOnlyPage .export-btn.secondary');
   if (returnBtn) {
     returnBtn.style.display = fromAdmin ? 'block' : 'none';
   }
   
-  // 清除标志（防止普通员工看到返回按钮）
-  sessionStorage.removeItem('emp_from_admin');
+  // 管理员点击"返回管理后台"后，清除标志；普通员工退出时也清除
+  localStorage.removeItem('emp_from_admin');
 }
 
 function empReenterStore() {
@@ -1854,6 +1858,7 @@ function empReenterStore() {
 }
 
 function empReturnToAdmin() {
+  localStorage.removeItem('emp_from_admin');
   document.getElementById('empStoreOnlyPage').style.display = 'none';
   showAdminLogin();
 }
